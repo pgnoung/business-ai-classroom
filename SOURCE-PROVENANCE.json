@@ -18,5 +18,17 @@
     "database",
     "customer messages",
     "private business seed"
-  ]
+  ],
+  "gateway": {
+    "observedDate": "2026-11-12",
+    "baseSourceCommit": "4316f979e75b9197b7bba1b4ac6d6c5618a6831b",
+    "upstreamEngineSha256": "895bd2dfaab2fb6dbcff66cade8be88fab09cc686c6176340e46afb2a9509d96",
+    "adaptations": [
+      "learner launcher and protected env migration",
+      "no mirror or private database reporter",
+      "allowlist-enforced fallback and nonempty readiness",
+      "authenticated bounded transcription adapter",
+      "explicit selected-model setup verification"
+    ]
+  }
 }

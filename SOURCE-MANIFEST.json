@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-11-live-derived",
+  "version": "2026-11-12-live-gateway",
   "files": [
     {
       "path": ".gitignore",
@@ -23,8 +23,13 @@
     },
     {
       "path": "INSTRUCTOR.md",
-      "bytes": 25716,
-      "sha256": "44453d15019d41696c6f7e337f1d79bf17bcef07a6356a986c51632c60d439b4"
+      "bytes": 26870,
+      "sha256": "1ff6bc0b661ba8d3d70155b7b5222b23f3e4f3e2ce760edbca7a51bc976438c6"
+    },
+    {
+      "path": "PARITY.md",
+      "bytes": 4155,
+      "sha256": "f4624b1400b3ea77ca17e159440b05d44cb9c7ce1a26a53b7430769b616c029d"
     },
     {
       "path": "PROGRESS.template.md",
@@ -33,13 +38,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 4370,
-      "sha256": "891b3aca6177a453e88eb904245162678520653b1fa943665f8c87c9d9d60f4e"
+      "bytes": 4825,
+      "sha256": "5b0afbb84f72e93393cd41ae6e07d348c91ea09d8aaa598f720cff47d0c1e870"
     },
     {
       "path": "RELEASE-NOTES.md",
-      "bytes": 3067,
-      "sha256": "1f61fc9c891c2b41cae32f5b053051fe904cb999b64d665799814521e501a7cc"
+      "bytes": 4627,
+      "sha256": "e9aaf5db6e3ad7c9a97897ff52b4381f8d82dd4b4a3b102ad09192837dd8237d"
     },
     {
       "path": "SKILL.md",
@@ -48,8 +53,8 @@
     },
     {
       "path": "SOURCE-PROVENANCE.json",
-      "bytes": 642,
-      "sha256": "34d23ed71130394d96c04a65815e1fa0a42219389ff40b2d17d49810ee103215"
+      "bytes": 1153,
+      "sha256": "ae0b37b5bf9acf99f438bdab4fcf5c50af9a440d0a1799a9df5bf676ee4b1ed1"
     },
     {
       "path": "TEACHER.md",
@@ -58,13 +63,13 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 1181,
-      "sha256": "75c5452215853ae02684b30669ad606990c76c49e466d62c3d02f45c63bf2411"
+      "bytes": 2246,
+      "sha256": "11c3a26f1c4b450879ac852a750bf693292843f715aeb4ebf894bbfe67fdf33a"
     },
     {
       "path": "modules/chatbot/.agents/skills/ai-admin-setup/SKILL.md",
-      "bytes": 16402,
-      "sha256": "a7f51d95282376f57cd857c0696ef95da5d63f787bc505d61d5e0fd04f841bc8"
+      "bytes": 18538,
+      "sha256": "ead146d0da4296533621212a581e4312fd69a13f2d90d61afeffa2ffe3c96204"
     },
     {
       "path": "modules/chatbot/.agents/skills/ai-admin-setup/references/daily-ops.md",
@@ -108,8 +113,8 @@
     },
     {
       "path": "modules/chatbot/.claude/skills/ai-admin-setup/SKILL.md",
-      "bytes": 16402,
-      "sha256": "a7f51d95282376f57cd857c0696ef95da5d63f787bc505d61d5e0fd04f841bc8"
+      "bytes": 18538,
+      "sha256": "ead146d0da4296533621212a581e4312fd69a13f2d90d61afeffa2ffe3c96204"
     },
     {
       "path": "modules/chatbot/.claude/skills/ai-admin-setup/references/daily-ops.md",
@@ -183,8 +188,8 @@
     },
     {
       "path": "modules/chatbot/README.md",
-      "bytes": 6594,
-      "sha256": "13dce3d8d5f0dacef54757e045032a127403a003bbe16783c5d8c8359bfe935a"
+      "bytes": 6831,
+      "sha256": "a620fdfaf43c221e56e15775ec7141716b09d3482af8ab471b51a31cb984842d"
     },
     {
       "path": "modules/chatbot/ai-admin.ps1",
@@ -257,14 +262,59 @@
       "sha256": "2509617244821e4d88f20d33590c471db53370c175389d6e770f5b289cd07062"
     },
     {
+      "path": "modules/chatbot/gateway/README.md",
+      "bytes": 6423,
+      "sha256": "417e29b43c2cf83937f8381fa96a4bcb5dbeab4e1f7f64045c8c48c118f39a8d"
+    },
+    {
+      "path": "modules/chatbot/gateway/audio.mjs",
+      "bytes": 3490,
+      "sha256": "be8ac82dd92d564f58d0b8f5afcba6a1583748086a0548e391c459f8f02f6538"
+    },
+    {
+      "path": "modules/chatbot/gateway/openai-stateless-gateway.mjs",
+      "bytes": 57327,
+      "sha256": "2c5ffbc6228898624958a17039f7e47bd7f0c7f63272e089cc267931cf1d1c2f"
+    },
+    {
+      "path": "modules/chatbot/gateway/serve.mjs",
+      "bytes": 4224,
+      "sha256": "26269968a5b0507a610e6f1ad4d7f109fa6b494ede28c7426708e640b1299843"
+    },
+    {
+      "path": "modules/chatbot/gateway/test/anthropic-gateway.test.mjs",
+      "bytes": 27566,
+      "sha256": "9ecf7dd93d80e83597f61df41984a07af11ec80d3c5694569a010850290f71c0"
+    },
+    {
+      "path": "modules/chatbot/gateway/test/learner-audio.test.mjs",
+      "bytes": 3328,
+      "sha256": "f893b3de5f58e4b97c68339961dbe466c3b548dc12a462da9ccdd4f8eb39fd72"
+    },
+    {
+      "path": "modules/chatbot/gateway/test/learner-launcher.test.mjs",
+      "bytes": 9833,
+      "sha256": "274beb856329fdac835be824fbd7b0565595322d76f32cd1e22b4f2773e90e0f"
+    },
+    {
+      "path": "modules/chatbot/gateway/test/openai-key-failover-gateway.test.mjs",
+      "bytes": 9626,
+      "sha256": "1d3e47ce56eec8d31109f7d885c119f79af7074a002c1eda00241cdd0733d1db"
+    },
+    {
+      "path": "modules/chatbot/gateway/test/openai-stateless-gateway.test.mjs",
+      "bytes": 49185,
+      "sha256": "c1c501945282a27ac998e1378bfd5575bdf06cec785b659ee7457fb26eb2d412"
+    },
+    {
       "path": "modules/chatbot/harness-cases.example.json",
       "bytes": 1286,
       "sha256": "5162e31b469c7ac0519575ad47abac6878daa58002f7c7cf5c0621eaead49718"
     },
     {
       "path": "modules/chatbot/package.json",
-      "bytes": 423,
-      "sha256": "56d84f8bbd9b210ea697cd8b6fdca31c102ce4228aeaa7c3d6a7806525a01a84"
+      "bytes": 374,
+      "sha256": "ae725b780cbf5c802d8d97514c703b21348e85412049d6e8f57e440e72f7e17d"
     },
     {
       "path": "modules/chatbot/public/console/ad-referral.css",
@@ -2773,8 +2823,8 @@
     },
     {
       "path": "modules/chatbot/starter/cli.mjs",
-      "bytes": 24402,
-      "sha256": "92ebdb2a68f9aebc3ee0f4d733da03ce3e7b7c7f005cab8a354d1c6945a011f7"
+      "bytes": 25429,
+      "sha256": "9c9d476ed0cbb0fa0b35991d2d1630cd69e47247fa8f9c8b118d84a170c750a4"
     },
     {
       "path": "modules/chatbot/starter/lib/pack.mjs",
@@ -2808,13 +2858,18 @@
     },
     {
       "path": "modules/chatbot/starter/remote/ai-admin-ctl.sh",
-      "bytes": 12327,
-      "sha256": "7ab00e0eab06a41c368532934310f174561d8aa2b6eafe173a690bd3c62277ee"
+      "bytes": 14224,
+      "sha256": "f656017d98e2e374dbc5f78a6fc236e49c6b22ffbaa1356ddaa8ddbedbee51f0"
     },
     {
       "path": "modules/chatbot/starter/remote/bootstrap.sh",
-      "bytes": 11056,
-      "sha256": "7394062632709b8f8a8529615c5441783f0015c9ccf5d6cfc361a474bfb7555e"
+      "bytes": 13812,
+      "sha256": "07ab72d51ba8ace25260c5e27387de2fa837016db8c7a242f5bfbbde36a92fda"
+    },
+    {
+      "path": "modules/chatbot/starter/remote/configure-gateway.mjs",
+      "bytes": 3128,
+      "sha256": "7714411542a20d7ed102741651eae5e4c56d68f1863aa029d0094a152f6fff90"
     },
     {
       "path": "modules/chatbot/starter/remote/harness.mjs",
@@ -2825,6 +2880,11 @@
       "path": "modules/chatbot/starter/remote/line-setup.mjs",
       "bytes": 4085,
       "sha256": "15dc7e35b99bd47a80faf3809c16c6cc3a69a21065af111c035f5278bfb047f3"
+    },
+    {
+      "path": "modules/chatbot/starter/remote/provider-check.mjs",
+      "bytes": 4679,
+      "sha256": "da291133af9a172811da4abece872caa2c43338e4222783e950342fb2d5441db"
     },
     {
       "path": "modules/chatbot/starter/remote/purge-test-chats.mjs",

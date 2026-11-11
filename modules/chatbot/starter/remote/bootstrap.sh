@@ -19,6 +19,7 @@ ETC=/etc/ai-admin
 ENV_FILE="$ETC/env"
 NODE_MAJOR=22
 PORT=4850
+GATEWAY_USER=aigateway
 
 say() { printf '%s\n' "$*"; }
 die() { printf '❌ %s\n' "$*" >&2; exit 1; }
@@ -61,6 +62,7 @@ else
 fi
 
 step "3/7 ผู้ใช้ระบบและโฟลเดอร์"
+id "$GATEWAY_USER" >/dev/null 2>&1 || useradd --system --home /nonexistent --shell /usr/sbin/nologin "$GATEWAY_USER"
 id "$APP_USER" >/dev/null 2>&1 || useradd --system --home "$DATA" --shell /usr/sbin/nologin "$APP_USER"
 install -d -m 750 -o "$APP_USER" -g "$APP_USER" "$DATA" "$DATA/img" "$DATA/backups"
 install -d -m 750 -o root -g "$APP_USER" "$ETC"
@@ -70,9 +72,33 @@ stamp="$(date +%Y%m%d-%H%M%S)"
 rel="$BASE/releases/$stamp"
 mkdir -p "$rel"
 tar -xzf "$RELEASE_TAR" -C "$rel"
+[ -f "$rel/gateway/serve.mjs" ] || die "release ไม่มี AI Gateway"
+[ -f "$rel/starter-remote/configure-gateway.mjs" ] || die "release ไม่มีตัวตั้งค่า Gateway"
 [ -f "$rel/src/server.mjs" ] || die "ไฟล์ release ไม่สมบูรณ์ (ไม่พบ src/server.mjs)"
 chown -R root:root "$rel"; chmod -R go-w "$rel"; chmod -R a+rX "$rel"
 old_rel="$(readlink "$BASE/current" 2>/dev/null || true)"
+
+# Keep a protected configuration/unit snapshot; any failed cutover restores both services.
+rollback_state="$(mktemp -d "$ETC/upgrade.XXXXXX")"; chmod 700 "$rollback_state"
+for file in "$ENV_FILE" "$ETC/gateway.env" /etc/systemd/system/ai-admin.service /etc/systemd/system/ai-admin-gateway.service /usr/local/sbin/ai-admin-ctl; do
+  [ ! -f "$file" ] || cp -p "$file" "$rollback_state/$(basename "$file")"
+done
+restore_failed_upgrade() {
+  local code=$?
+  if [ "$code" != 0 ]; then
+    systemctl stop ai-admin ai-admin-gateway >/dev/null 2>&1 || true
+    for file in "$ENV_FILE" "$ETC/gateway.env" /etc/systemd/system/ai-admin.service /etc/systemd/system/ai-admin-gateway.service /usr/local/sbin/ai-admin-ctl; do
+      if [ -f "$rollback_state/$(basename "$file")" ]; then cp -p "$rollback_state/$(basename "$file")" "$file"; else rm -f "$file"; fi
+    done
+    if [ -n "$old_rel" ]; then ln -sfn "$old_rel" "$BASE/current.new"; mv -Tf "$BASE/current.new" "$BASE/current"; else rm -f "$BASE/current"; fi
+    systemctl daemon-reload
+    [ ! -f "$rollback_state/ai-admin-gateway.service" ] || systemctl restart ai-admin-gateway >/dev/null 2>&1 || true
+    [ -z "$old_rel" ] || systemctl restart ai-admin >/dev/null 2>&1 || true
+    say "การอัปเกรดไม่สำเร็จ คืนค่าโปรแกรมและค่าตั้งต้นจากสำเนาก่อนอัปเกรดแล้ว"
+  fi
+  rm -rf "$rollback_state"
+}
+trap restore_failed_upgrade EXIT
 
 step "5/7 ค่าตั้งต้น (สร้างครั้งแรกเท่านั้น ค่าเดิมไม่ถูกแตะ)"
 touch "$ENV_FILE"; chown root:"$APP_USER" "$ENV_FILE"; chmod 640 "$ENV_FILE"
@@ -110,12 +136,38 @@ sed -i -E "s#^CONSOLE_PUBLIC_BASE_URL=.*#CONSOLE_PUBLIC_BASE_URL=https://$HOST#;
 [ -f "$DATA/image-catalog.json" ] || { printf '[]\n' > "$DATA/image-catalog.json"; chown "$APP_USER:$APP_USER" "$DATA/image-catalog.json"; }
 printf '%s\n' "$HOST" > "$ETC/host"
 
+"$BASE/node/bin/node" "$rel/starter-remote/configure-gateway.mjs" "$rel/config/model-pricing.json"
+chown root:"$APP_USER" "$ENV_FILE"; chmod 640 "$ENV_FILE"
+chown root:"$GATEWAY_USER" "$ETC/gateway.env"; chmod 640 "$ETC/gateway.env"
+# systemd reads EnvironmentFile as root; the isolated gateway has no access to the chassis DB.
+cat > /etc/systemd/system/ai-admin-gateway.service <<UNIT
+[Unit]
+Description=Business AI stateless provider gateway
+After=network-online.target
+Wants=network-online.target
+[Service]
+User=$GATEWAY_USER
+Group=$GATEWAY_USER
+WorkingDirectory=$BASE/current
+EnvironmentFile=$ETC/gateway.env
+ExecStart=$BASE/node/bin/node gateway/serve.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+UMask=0077
+[Install]
+WantedBy=multi-user.target
+UNIT
+
 step "6/7 บริการระบบ (เปิดเองเมื่อเครื่องรีสตาร์ต)"
 cat > /etc/systemd/system/ai-admin.service <<UNIT
 [Unit]
 Description=AI Admin Starter (LINE OA AI admin + console)
-After=network-online.target
-Wants=network-online.target
+After=network-online.target ai-admin-gateway.service
+Wants=network-online.target ai-admin-gateway.service
 
 [Service]
 User=$APP_USER
@@ -138,7 +190,7 @@ WantedBy=multi-user.target
 UNIT
 install -m 750 "$rel/starter-remote/ai-admin-ctl.sh" /usr/local/sbin/ai-admin-ctl
 systemctl daemon-reload
-systemctl enable ai-admin.service >/dev/null 2>&1
+systemctl enable ai-admin.service ai-admin-gateway.service >/dev/null 2>&1
 # อัปเดตเครื่องที่ใช้งานอยู่: สำรองฐานข้อมูลก่อนเสมอ (เผื่อเวอร์ชันใหม่ปรับโครงฐาน)
 if [ -f "$DATA/chassis.sqlite" ] && [ -n "$old_rel" ]; then /usr/local/sbin/ai-admin-ctl backup >/dev/null; fi
 switch_to() { ln -sfn "$1" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"; }
@@ -147,13 +199,15 @@ healthy() {
   return 1
 }
 switch_to "$rel"
+systemctl restart ai-admin-gateway.service
+for _ in $(seq 1 40); do
+  [ "$(curl -s -o /dev/null -w "%{http_code}" -m 2 http://127.0.0.1:8650/v1/models/health || true)" != 401 ] || break
+  sleep 1
+done
+[ "$(curl -s -o /dev/null -w "%{http_code}" -m 2 http://127.0.0.1:8650/v1/models/health || true)" = 401 ] || die "AI Gateway ยังไม่พร้อม"
 systemctl restart ai-admin.service
 if ! healthy; then
   journalctl -u ai-admin -n 40 --no-pager
-  if [ -n "$old_rel" ] && [ -d "$old_rel" ]; then
-    switch_to "$old_rel"; systemctl restart ai-admin.service
-    die "เวอร์ชันใหม่เปิดไม่ขึ้น — ถอยกลับเวอร์ชันเดิมให้แล้ว (ข้อความด้านบนบอกสาเหตุ)"
-  fi
   die "ระบบเปิดไม่ขึ้น — ดูข้อความด้านบน"
 fi
 # ผ่านแล้วจึงจำเวอร์ชันก่อนหน้าไว้ถอยกลับ + เก็บแค่ 3 เวอร์ชันล่าสุด

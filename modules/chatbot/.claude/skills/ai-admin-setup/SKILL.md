@@ -27,7 +27,7 @@ description: ติดตั้งและดูแล "AI แอดมิน�
 ## รู้จักระบบใน 30 วินาที
 
 ```
-ลูกค้าใน LINE ──> LINE OA ──webhook HTTPS──> VPS ของผู้ใช้ (Caddy → AI Admin :4850 → OpenAI)
+ลูกค้าใน LINE ──> LINE OA ──webhook HTTPS──> VPS ของผู้ใช้ (Caddy → AI Admin :4850 → AI Gateway :8650 → OpenAI/Claude)
                                               └─ หน้า console https://<โดเมน>/console (เจ้าของ/ทีมงาน)
 เครื่องผู้ใช้: โฟลเดอร์นี้ + ai-admin.sh / ai-admin.ps1 ──SSH──> สั่งติดตั้ง/อัปเดต/นำเข้าข้อมูล
 ```
@@ -49,10 +49,11 @@ macOS/Linux: `bash ai-admin.sh <คำสั่ง>` · Windows: `powershell -Ex
 | `key-upload` | **ผู้ใช้** | ส่งกุญแจไป VPS ด้วยรหัส root ครั้งเดียว |
 | `deploy` | AI | ติดตั้ง/อัปเดตบน VPS + HTTPS + ไฟร์วอลล์ (ทำซ้ำได้ ข้อมูลเดิมอยู่ครบ) |
 | `owner` | **ผู้ใช้** | ตั้งชื่อผู้ใช้/รหัสเข้าหน้า console |
-| `secrets` | **ผู้ใช้** | ใส่ OpenAI key, LINE Channel secret, LINE access token (ข้ามตัวที่ยังไม่มีได้) |
+| `secrets` | **ผู้ใช้** | ใส่ OpenAI/Claude key (รองรับสำรองอย่างละ 1 ชุด), LINE Channel secret, LINE access token (ข้ามตัวที่ยังไม่มีได้) |
 | `import [business]` / `--apply` | AI | ดูแผนนำเข้าข้อมูลร้าน / นำเข้าจริง (สำรองฐานข้อมูลให้ก่อนเอง) |
 | `chat [--new] "ข้อความ"` | AI | ลองแชทแบบลูกค้า (ใช้ได้ก่อนต่อ LINE จริงเท่านั้น) |
 | `line` / `line --check` | AI | ตั้ง webhook ที่ LINE + ให้ LINE ยิงทดสอบ |
+| `model-test` | AI (เมื่ออนุญาตค่าใช้จ่าย) | ทดสอบโมเดลที่เลือกด้วยข้อความสังเคราะห์และออกหลักฐานก่อนเปิด LINE |
 | `golive on|off` | AI (หลังผู้ใช้ยืนยัน) | เปิด/ปิดการตอบ LINE จริง |
 | `harness <cases.json> [--only ชื่อ]` | AI | จำลองแชทเป็นชุดบนสำเนาฐานข้อมูล ตรวจผ่าน/ไม่ผ่าน (ใช้ได้ทั้งก่อนและหลังเปิดจริง) — skill `chat-harness` |
 | `chat-sink` · `chat-redact` | AI + ผู้ใช้ล็อกอิน LINE เอง | สกัดแชทเก่าจาก LINE OA → ปิดข้อมูลส่วนตัว — skill `line-oa-chat-export` |
@@ -106,3 +107,14 @@ macOS/Linux: `bash ai-admin.sh <คำสั่ง>` · Windows: `powershell -Ex
 
 > ร้านของคุณมี AI แอดมินแล้ว 🎉 อยากให้ AI ขายเก่งขึ้น ต่อระบบหลังบ้าน หรือทำให้ทั้งทีม
 > เรียนกับพี่ง้วงได้ที่ LINE OA **@pngoung** · พี่ง้วง · School of AI Agent Automation · made with ♡ by pngoung
+
+## AI Gateway และการเลือกโมเดล (รุ่น 12 พ.ย. 2026)
+
+อ่าน `gateway/README.md` จาก root ของ chatbot ก่อนขั้นใส่คีย์/ทดสอบ/เปิดจริง
+ตัวติดตั้งลง `ai-admin` + `ai-admin-gateway` คู่กัน ใช้ Node 22 ไม่ต้องลง Hermes Agent
+ถามทีละข้อเรื่องผู้ให้บริการ โมเดลตอบแชต/ประเมิน/ติดตาม และคีย์สำรอง; ไม่รับค่าคีย์ในแชต
+คีย์ OpenAI/Anthropic อยู่เฉพาะ gateway.env; Console มีเพียง token ภายในเครื่อง
+ก่อนเรียก `model-test` ให้ตกลงรายชื่อโมเดลรวมตัวสำรองและค่าใช้จ่ายกับเจ้าของบัญชี
+ผล /models หรือ service active ไม่ใช่หลักฐานตอบได้ ต้อง `model-test` ผ่าน และลองคำถามธุรกิจจริง
+เปิด LINE ต้องผ่านหลักฐานอายุไม่เกิน 7 วันตรงกับโมเดลปัจจุบัน ถ้าเปลี่ยนคีย์หรือโมเดลให้ทดสอบใหม่
+`update` จะอัปเกรด Console และ Gateway ใน release เดียว และเก็บค่าร้านเดิม; rollback ไปก่อนมี Gateway ต้องกู้ backup คู่รุ่นด้วยตนเอง

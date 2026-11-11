@@ -16,7 +16,24 @@ die() { printf '❌ %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" = 0 ] || die "ต้องรันด้วย root"
 
 # ค่าที่ตั้งผ่าน set-env / brand.env ได้ (กันตั้งค่าแปลก ๆ ทับระบบ)
-ALLOWED='^(OPENAI_API_KEY|HERMES_API_KEY|LINE_CHANNEL_SECRET|LINE_CHANNEL_ACCESS_TOKEN|LINE_CHANNEL_NAME|LINE_BASIC_ID|LINE_LIVE_SEND|HERMES_MODEL|HERMES_SCORER_MODEL|HERMES_FOLLOWUP_MODEL|BRAND_AGENT_NAME|BRAND_OWNER_NAME|BRAND_BUSINESS_NAME|BRAND_REVIEW_DOMAINS|BUSINESS_ID|BUSINESS_PROFILE|PERSONA_PARTICLES|CONSOLE_BRAND_NAME|CONSOLE_BRAND_MARK|CONSOLE_BRAND_AGENT|CONSOLE_BRAND_THEME|ESCALATE_NOTIFY_IDS|FOLLOWUP_ENABLED|BROADCAST_ENABLED|IMAGE_CLASSIFY_ENABLED|FB_ENABLED|FB_LIVE_SEND|FB_PAGE_ACCESS_TOKEN|FB_APP_SECRET|FB_VERIFY_TOKEN)$'
+ALLOWED='^(OPENAI_API_KEY|OPENAI_API_KEY_2|ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_2|ANTHROPIC_WORKSPACE_ID|ANTHROPIC_WORKSPACE_ID_2|HERMES_API_KEY|LINE_CHANNEL_SECRET|LINE_CHANNEL_ACCESS_TOKEN|LINE_CHANNEL_NAME|LINE_BASIC_ID|LINE_LIVE_SEND|HERMES_MODEL|HERMES_SCORER_MODEL|HERMES_FOLLOWUP_MODEL|BRAND_AGENT_NAME|BRAND_OWNER_NAME|BRAND_BUSINESS_NAME|BRAND_REVIEW_DOMAINS|BUSINESS_ID|BUSINESS_PROFILE|PERSONA_PARTICLES|CONSOLE_BRAND_NAME|CONSOLE_BRAND_MARK|CONSOLE_BRAND_AGENT|CONSOLE_BRAND_THEME|ESCALATE_NOTIFY_IDS|FOLLOWUP_ENABLED|BROADCAST_ENABLED|IMAGE_CLASSIFY_ENABLED|FB_ENABLED|FB_LIVE_SEND|FB_PAGE_ACCESS_TOKEN|FB_APP_SECRET|FB_VERIFY_TOKEN)$'
+
+gateway_get() { grep -E "^$1=" /etc/ai-admin/gateway.env 2>/dev/null | tail -n1 | cut -d= -f2- || true; }
+gateway_put() {
+  local saved="$ENV_FILE"
+  ENV_FILE=/etc/ai-admin/gateway.env; env_put "$1" "$2"; ENV_FILE="$saved"
+  chown root:aigateway /etc/ai-admin/gateway.env; chmod 640 /etc/ai-admin/gateway.env
+}
+restart_all() {
+  systemctl restart ai-admin-gateway
+  local ready=0
+  for _ in $(seq 1 40); do
+    if [ "$(curl -s -o /dev/null -w "%{http_code}" -m 2 http://127.0.0.1:8650/v1/models/health || true)" = 401 ]; then ready=1; break; fi
+    sleep 1
+  done
+  [ "$ready" = 1 ] || die "Gateway ยังไม่พร้อม — ตรวจสถานะก่อนเริ่มทดสอบโมเดล"
+  systemctl restart ai-admin; wait_health
+}
 
 env_get() { grep -E "^$1=" "$ENV_FILE" 2>/dev/null | tail -n1 | cut -d= -f2- || true; }
 
@@ -71,21 +88,27 @@ cmd_set_env() { # stdin: KEY=VALUE ต่อบรรทัด
     [[ "$line" == *=* ]] || die "รูปแบบต้องเป็น KEY=VALUE"
     key="${line%%=*}"; val="${line#*=}"
     [[ "$key" =~ $ALLOWED ]] || die "ไม่อนุญาตให้ตั้ง $key"
-    env_put "$key" "$val"; n=$((n + 1)); keys+=("$key")
+    case "$key" in
+      OPENAI_API_KEY) gateway_put "$key" "$val"; rm -f "$DATA/provider-receipt.json" ;;
+      OPENAI_API_KEY_2|ANTHROPIC_*) gateway_put "$key" "$val"; rm -f "$DATA/provider-receipt.json" ;;
+      HERMES_API_KEY|HERMES_BASE) die "Gateway endpoint/token จัดการโดยตัวติดตั้ง ไม่รับผ่าน set-env" ;;
+      *) env_put "$key" "$val" ;;
+    esac
+    n=$((n + 1)); keys+=("$key")
     if [ "$key" = LINE_CHANNEL_SECRET ]; then env_drop 'LINE_SANDBOX|LINE_MOCK_URL'; fi # ใส่ของจริงแล้ว เลิกโหมดทดลอง
-    if [ "$key" = OPENAI_API_KEY ] && [ "$(env_get HERMES_BASE)" = "https://api.openai.com/v1" ]; then
-      env_put HERMES_API_KEY "$val" # คีย์เดียวใช้ทั้งตอบแชทและถอดเสียง
-    fi
+
   done
   say "✅ บันทึกแล้ว $n ค่า: ${keys[*]:-}"
 }
 
-cmd_check_openai() { # ทดสอบคีย์ด้วย Node (คีย์ไม่ขึ้นใน argv ของ process ใด)
-  run_as_app -e '
-    const key = process.env.OPENAI_API_KEY || "";
-    if (!key) { console.log("none"); process.exit(0); }
-    fetch((process.env.OPENAI_BASE || "https://api.openai.com/v1") + "/models", { headers: { authorization: "Bearer " + key } })
-      .then((r) => console.log(String(r.status)), () => console.log("network"));'
+cmd_check_openai() { # metadata only; protected provider key never enters chassis env or argv
+  "$NODE" --input-type=module -e '
+    import { readFileSync } from "node:fs";
+    const values=Object.fromEntries(readFileSync("/etc/ai-admin/gateway.env","utf8").split(/\r?\n/).filter(x=>x.includes("=")).map(x=>[x.slice(0,x.indexOf("=")),x.slice(x.indexOf("=")+1)]));
+    const key=values.OPENAI_API_KEY;
+    if(!key){console.log("none");process.exit(0);}
+    fetch("https://api.openai.com/v1/models",{headers:{authorization:"Bearer "+key},redirect:"error",signal:AbortSignal.timeout(10000)})
+      .then(r=>console.log(String(r.status)),()=>console.log("network"));'
 }
 
 cmd_set_owner() { # stdin: username\npassword
@@ -102,11 +125,14 @@ cmd_status() {
   local host; host="$(cat /etc/ai-admin/host 2>/dev/null || echo '?')"
   say "เว็บ:        https://$host/console"
   say "Webhook:    https://$host/webhooks/line"
-  say "บริการ:      $(systemctl is-active ai-admin || true) · HTTPS: $(systemctl is-active caddy || true)"
+  say "บริการ:      $(systemctl is-active ai-admin || true) · Gateway: $(systemctl is-active ai-admin-gateway || true) · HTTPS: $(systemctl is-active caddy || true)"
   say "เวอร์ชัน:    $(basename "$(readlink "$APP")")"
-  for k in OPENAI_API_KEY LINE_CHANNEL_SECRET LINE_CHANNEL_ACCESS_TOKEN; do
+  for k in LINE_CHANNEL_SECRET LINE_CHANNEL_ACCESS_TOKEN; do
     if [ "$k" = LINE_CHANNEL_SECRET ] && [ -n "$(env_get LINE_SANDBOX)" ]; then say "$k: ยังไม่ใส่ (ตอนนี้เป็นโหมดทดลอง)"
     elif [ -n "$(env_get "$k")" ]; then say "$k: ใส่แล้ว"; else say "$k: ยังไม่ใส่"; fi
+  done
+  for k in OPENAI_API_KEY OPENAI_API_KEY_2 ANTHROPIC_API_KEY ANTHROPIC_API_KEY_2; do
+    if [ -n "$(gateway_get "$k")" ]; then say "Gateway $k: ใส่แล้ว"; else say "Gateway $k: ยังไม่ใส่"; fi
   done
   say "ส่ง LINE จริง: $(env_get LINE_LIVE_SEND)"
   say "ชื่อ AI:     $(env_get BRAND_AGENT_NAME) · ร้าน: $(env_get BRAND_BUSINESS_NAME)"
@@ -161,14 +187,15 @@ cmd_golive() {
     on)
       [ -n "$(env_get LINE_CHANNEL_ACCESS_TOKEN)" ] || die "ยังไม่ได้ใส่ LINE Channel access token"
       [ -z "$(env_get LINE_SANDBOX)" ] || die "ยังไม่ได้ใส่ LINE Channel secret ของจริง"
-      [ -n "$(env_get OPENAI_API_KEY)" ] || die "ยังไม่ได้ใส่ OpenAI API key"
+      [ -n "$(gateway_get OPENAI_API_KEY)" ] || die "ยังไม่ได้ใส่ OpenAI API key"
+      run_as_app "$APP/starter-remote/provider-check.mjs" --verify || die "ต้อง model-test โมเดลที่เลือกให้ผ่านก่อนเปิด LINE"
       stop_service
       run_as_app "$APP/starter-remote/purge-test-chats.mjs" # ห้องลองแชทไม่ใช่ลูกค้าจริง
       env_put LINE_LIVE_SEND true
       start_service ;;
     off)
       env_put LINE_LIVE_SEND false
-      systemctl restart ai-admin; wait_health ;;
+      restart_all ;;
     *) die "ใช้ golive on หรือ golive off" ;;
   esac
   say "✅ ส่ง LINE จริง = $(env_get LINE_LIVE_SEND)"
@@ -193,17 +220,19 @@ cmd_backup() { # สำเนาฐานข้อมูลแบบปลอด
 
 cmd_rollback() {
   [ -L "$BASE/previous" ] || die "ไม่มีเวอร์ชันก่อนหน้าให้ถอย"
+  [ -f "$BASE/previous/gateway/serve.mjs" ] || die "รุ่นก่อนหน้ายังไม่มี Gateway — ต้องคืนค่าจาก backup ที่ตรงรุ่นด้วยตนเอง"
   ln -sfn "$(readlink "$BASE/previous")" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
-  systemctl restart ai-admin; wait_health; say "✅ ถอยกลับเป็น $(basename "$(readlink "$BASE/current")")"
+  restart_all; say "✅ ถอยกลับเป็น $(basename "$(readlink "$BASE/current")")"
 }
 
 case "${1:-status}" in
   set-env) cmd_set_env ;;
+  model-test) run_as_app "$APP/starter-remote/provider-check.mjs" --test ;;
   check-openai) cmd_check_openai ;;
   set-owner) cmd_set_owner ;;
   status) cmd_status ;;
   logs) journalctl -u ai-admin -n "${2:-80}" --no-pager ;;
-  restart) systemctl restart ai-admin; wait_health; say "✅ เปิดใหม่แล้ว" ;;
+  restart) restart_all; say "✅ เปิดใหม่แล้ว" ;;
   import) shift; cmd_import "$@" ;;
   chat) shift; cmd_chat "$@" ;;
   harness) shift; cmd_harness "$@" ;;

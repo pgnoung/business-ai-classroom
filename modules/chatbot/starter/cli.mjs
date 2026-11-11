@@ -11,7 +11,7 @@ import {
   DEFAULT_KEY, ROOT, isHostname, isIPv4, loadState, saveState, scp, scpFrom, ssh, sslipHost, which,
 } from "./lib/ssh.mjs";
 
-const RELEASE_PATHS = ["src", "public", "config", "tools", "package.json"];
+const RELEASE_PATHS = ["src", "public", "config", "tools", "gateway", "package.json"];
 const say = (t = "") => process.stdout.write(`${t}\n`);
 class CliError extends Error { constructor(message, code = 1) { super(message); this.code = code; } }
 // โยน error แทน process.exit เพื่อให้ finally ลบไฟล์ชั่วคราว (ซึ่งอาจมีข้อมูลร้าน) ทุกครั้ง
@@ -184,6 +184,13 @@ async function cmdSecrets() {
     if (!/^sk-[A-Za-z0-9_-]{20,}$/.test(openai)) fail("รูปแบบ OpenAI key ไม่ถูก (ต้องขึ้นต้น sk-)");
     lines.push(`OPENAI_API_KEY=${openai}`);
   }
+  for (const [field, label] of [["OPENAI_API_KEY_2", "OpenAI key สำรอง (ไม่จำเป็น)"], ["ANTHROPIC_API_KEY", "Anthropic / Claude API key (ไม่จำเป็น)"], ["ANTHROPIC_API_KEY_2", "Anthropic key สำรอง (ไม่จำเป็น)"]]) {
+    const value = await io.secret(field, label);
+    if (value) {
+      if (!/^sk-[A-Za-z0-9_-]{20,}$/.test(value)) fail("รูปแบบ provider API key ไม่ถูกต้อง");
+      lines.push(`${field}=${value}`);
+    }
+  }
   const secret = await io.secret("line_secret", "LINE Channel secret (32 ตัวอักษร จากแท็บ Basic settings)");
   if (secret) {
     if (!/^[0-9a-f]{32}$/i.test(secret)) fail("Channel secret ต้องเป็นตัวอักษร 0-9 a-f ยาว 32 ตัว");
@@ -294,6 +301,7 @@ async function cmdUpdate() {
 }
 
 const HELP = `AI Admin Starter — คำสั่ง (${launcherHint()} <คำสั่ง>)
+  model-test                 ทดสอบโมเดลที่เลือกด้วยข้อความจำลอง (ใช้เครดิต ต้องอนุญาตก่อน)
   check                      ตรวจเครื่องนี้พร้อมไหม
   keygen                     สร้างกุญแจ SSH ของชุดนี้
   connect <IP> [--domain d]  บอกที่อยู่ VPS (ไม่มีโดเมนก็ได้)
@@ -313,6 +321,11 @@ const [cmd = "help", ...args] = process.argv.slice(2);
 const quote = (a) => `'${String(a).replace(/'/g, "'\\''")}'`;
 try {
   switch (cmd) {
+    case "model-test": {
+      const result = await ctl(needState(), "model-test");
+      if (result.code !== 0) fail("โมเดลยังไม่ผ่านการทดสอบครบ — ยังไม่เปิดตอบลูกค้า");
+      break;
+    }
     case "check": await cmdCheck(); break;
     case "keygen": cmdKeygen(); break;
     case "connect": await cmdConnect(args); break;

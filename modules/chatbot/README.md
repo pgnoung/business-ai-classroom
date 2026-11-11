@@ -12,7 +12,7 @@
 - **ส่งต่อให้คน** ธง "ต้องการคน" + ปิด AI รายห้อง + ทีมตอบจากหน้า console ได้เลย
 - **ออเดอร์ · แท็กลูกค้า · บรอดแคสต์ · ข้อความตามขั้น** ในหน้า console เดียว
 - **ซื่อตรง** ลูกค้าถามว่าเป็นบอทไหม ตอบความจริงเสมอ
-- **ข้อมูลอยู่ที่คุณ** รันบน VPS ของร้านเอง ใช้คีย์ OpenAI ของร้านเอง
+- **ข้อมูลอยู่ที่คุณ** รันบน VPS ของร้านเอง ใช้คีย์ OpenAI/Claude ของร้านเอง ผ่าน AI Gateway บนเครื่องเดียวกัน
 
 ## เริ่มต้น (แนะนำ: ให้ AI ติดตั้งให้)
 
@@ -28,7 +28,7 @@ macOS/Linux `bash ai-admin.sh <คำสั่ง>` · Windows `powershell -Exec
 
 ```
 check · keygen · connect <IP> · key-upload · deploy · owner · secrets
-import [business] [--apply] · chat "ข้อความ" · line · golive on|off
+model-test · import [business] [--apply] · chat "ข้อความ" · line · golive on|off
 harness <cases.json> · chat-sink · chat-redact
 status · logs · restart · backup · rollback · update
 ```
@@ -49,10 +49,10 @@ status · logs · restart · backup · rollback · update
 ## ความปลอดภัยและความเป็นส่วนตัว
 
 ค่าลับพิมพ์เองใน Terminal เท่านั้น (ไม่ผ่านแชทกับ AI) · เก็บบน VPS ในไฟล์ที่อ่านได้เฉพาะระบบ · ไฟร์วอลล์เปิดแค่ 22/80/443 ·
-หน้า console ต้องล็อกอิน (HTTPS) · ข้อความลูกค้าถูกส่งให้ OpenAI เพื่อร่างคำตอบ — แจ้งลูกค้าตามนโยบายความเป็นส่วนตัวของร้าน ·
+หน้า console ต้องล็อกอิน (HTTPS) · ข้อความลูกค้าถูกส่งให้ผู้ให้บริการ AI ที่เลือก (OpenAI/Anthropic) เพื่อร่างคำตอบ — แจ้งลูกค้าตามนโยบายความเป็นส่วนตัวของร้าน ·
 `business/`, `backups/`, `starter/.state.json` อยู่ในเครื่องคุณและไม่ถูก commit
 
-ชุดนี้แจกเฉพาะผู้เรียน — กรุณาอย่าเผยแพร่ต่อ
+อ่านวิธีเลือกโมเดล คีย์สำรอง การอัปเกรด และข้อจำกัดใน [gateway/README.md](gateway/README.md)
 
 <!-- pngoung-brand:start -->
 ---

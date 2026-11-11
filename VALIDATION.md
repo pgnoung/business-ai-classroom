@@ -1,3 +1,13 @@
+# Gateway update verification — 2026-11-12
+
+- Full portable chatbot + Gateway suite: **4,877 passed, 0 failed, 0 skipped**, Node 22.23.2 on macOS.
+- Included Gateway suite: **86 passed**; synthetic provider mocks test OpenAI/Claude forwarding, key failover, fallback allowlist, readiness, migration, model-test receipts, and bounded audio forwarding.
+- Shell syntax checked for bootstrap/control scripts. Symlink launcher execution verified.
+- Independent JavaScript/code review: high findings fixed; public privacy re-audit passed with non-blocking legacy protocol naming warnings.
+- No paid provider calls, customer messages, learner VPS deployment, Windows execution or fresh systemd/Caddy recovery test in this update.
+- The original local Console UI verification below remains applicable to unchanged UI assets; this update tests the Gateway/installer integration in local tests.
+- model-test is a pre-go-live setup receipt, not continuous authorization enforcement after model changes. Catalog availability/pricing must be checked for the learner account.
+
 # Verification scope
 
 - Upstream source: 535 chassis file hashes matched the running release before generic adaptation.
