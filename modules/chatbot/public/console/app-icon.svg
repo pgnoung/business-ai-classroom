@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LuKprae Console">
+  <rect width="512" height="512" rx="112" fill="#030815"/>
+  <circle cx="256" cy="242" r="148" fill="#2D8CFF"/>
+  <path d="M166 213c0-53 40-92 90-92s90 39 90 92v59c0 69-41 119-90 119s-90-50-90-119z" fill="#F5F8FF"/>
+  <path d="M188 216c11-45 38-67 68-67 31 0 58 22 68 67-21-14-43-21-68-21s-47 7-68 21z" fill="#081326"/>
+  <circle cx="221" cy="256" r="12" fill="#081326"/>
+  <circle cx="291" cy="256" r="12" fill="#081326"/>
+  <path d="M218 310c25 24 51 24 76 0" fill="none" stroke="#0B5FC4" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="383" cy="382" r="70" fill="#06C755" stroke="#030815" stroke-width="18"/>
+  <path d="m351 381 21 21 43-49" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

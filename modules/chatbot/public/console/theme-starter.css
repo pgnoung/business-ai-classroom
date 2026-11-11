@@ -1,0 +1,51 @@
+/* theme-starter.css — ธีมกลางของคอนโซลสำหรับร้านทั่วไป (white-label, 8 ต.ค. 2026)
+   ทำงานเฉพาะ :root.theme-starter (เซิร์ฟเวอร์ใส่คลาสนี้เมื่อ branding.theme = "starter")
+   ทิศทาง: พื้นสว่างอ่านง่าย น้ำเงินเทาสงบ + เขียวอมฟ้า (teal) เป็นสีหลักสีเดียว ไม่มีภาพตัวละคร
+   ไม่มีฟอนต์/รูปภายนอก ใช้ฟอนต์ระบบตาม console.css — ทุกคู่สีตัวหนังสือ ≥ 4.5:1 บนพื้นของมัน */
+
+:root.theme-starter {
+  color-scheme: light;
+  --bg: #f4f7f8;
+  --surface: #ffffff;
+  --surface-2: #edf2f4;
+  --surface-3: #e3eaee;
+  --ink: #18262f; --ink-2: #485a66; --ink-3: #566874; --muted: #485a66;
+  --line: #dfe6ea; --line-2: #c6d2d9;
+  --brand: #0f766e; --brand-600: #0d6a63; --brand-700: #0b5953;
+  --brand-50: #eaf6f4; --brand-100: #cbebe6; --brand-ink: #0b5953; --on-brand: #ffffff;
+  --grad-brand: linear-gradient(120deg, #0f766e, #2a8f9c);
+  --green: #166a4c; --green-soft: #e6f5ee; --green-line: #bfe1d1;
+  --red: #b0293b; --red-soft: #fdeef0; --red-line: #edc4ca;
+  --danger: var(--red); --danger-soft: var(--red-soft); --danger-line: var(--red-line);
+  --orange: #94530a; --orange-soft: #fdf3e2; --orange-line: #ead6a8;
+  --purple: #5a4bb0; --purple-soft: #f1effc; --purple-line: #d9d4f5;
+  --hot: #d1553a; --hot-ink: #9e3820; --hot-soft: #fdefe9; --hot-track: #f4d6cc;
+  --warm: #c58f12; --warm-ink: #6f5000; --warm-soft: #fdf5dc; --warm-track: #efdfae;
+  --qualify: #f2d70c; --qualify-ink: #3a3100; --qualify-soft: #fbf3b2;
+  --cold: #6b8aa6; --cold-ink: #3f5a72; --cold-soft: #edf2f7; --cold-track: #d6e1ea;
+  --neutral-soft: #edf2f4; --neutral-strong: #18262f;
+  --chart-inbound: var(--brand);
+  --chart-inbound-fill: color-mix(in srgb, var(--brand) 14%, transparent);
+  --chart-revenue: #3f6c8f;
+  --chart-revenue-muted: color-mix(in srgb, #3f6c8f 22%, transparent);
+  --radius: 12px; --radius-lg: 16px;
+  --shadow-1: 0 1px 2px rgba(24, 38, 47, 0.06);
+  --shadow-2: 0 4px 10px -4px rgba(24, 38, 47, 0.16);
+  --shadow-sheet: -8px 0 24px -10px rgba(24, 38, 47, 0.28);
+}
+
+/* ชื่อ AI แอดมินของร้านเป็นบรรทัดรองใต้ชื่อร้าน (ธีมตั้งต้นซ่อนไว้) */
+:root.theme-starter .brand-text { display: inline-flex; flex-direction: column; line-height: 1.2; }
+:root.theme-starter .brand-agent { display: block; font-size: 12px; font-weight: 500; color: var(--ink-3); white-space: nowrap; }
+
+:root.theme-starter .brand-mark,
+:root.theme-starter .login-mark { background: var(--brand); color: var(--on-brand); }
+:root.theme-starter .btn-primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+:root.theme-starter .btn-primary:hover { background: var(--brand-600); border-color: var(--brand-600); }
+:root.theme-starter .btn-primary:active { background: var(--brand-700); border-color: var(--brand-700); }
+:root.theme-starter .topnav-link.is-active { color: var(--brand-ink); background: var(--brand-50); }
+:root.theme-starter :focus-visible { outline-color: var(--brand); }
+
+/* หน้าเข้าสู่ระบบ: พื้นเรียบ ไม่มีหน้าต่างตัวละคร */
+:root.theme-starter .login-body { background: var(--bg); }
+:root.theme-starter .login-stage { display: none; }

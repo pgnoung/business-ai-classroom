@@ -1,0 +1,383 @@
+/* ownerReviewDaily.css — แท็บ "ตรวจแชทวันนี้" ของห้องตรวจ (#/owner-review/daily · เฟส B · 12 ต.ค. 2026)
+   ภาษาเดียวกับแท็บรอยืนยันปิด (ownerReview.css): กองการ์ดมีน้ำหนัก · สีบอกความหมาย · ปุ่มใหญ่ระยะนิ้วโป้ง
+   แดง = น่าห่วง · เขียว = ปกติ/ดีแล้ว · อำพัน = ต้องปรับ · ม่วงเทา = AI ยังไม่ได้อ่าน
+   ใช้ token ของธีมเท่านั้น (สว่าง/มืดตามธีม) · โมชันเฉพาะ transform/opacity · ลดโมชัน = ไฮไลต์นิ่งแทนการกะพริบ */
+
+/* --------------------------------- โทนของห้อง --------------------------------- */
+
+.tone-risk { --orv-accent: var(--red); --orv-chip-bg: var(--red-soft); --orv-chip-ink: var(--red); }
+.tone-calm { --orv-accent: var(--green); --orv-chip-bg: var(--green-soft); --orv-chip-ink: var(--green); }
+.tone-unread { --orv-accent: var(--cold); --orv-chip-bg: var(--cold-soft); --orv-chip-ink: var(--cold-ink); }
+.next-tone-risk { --orv-next: var(--red); }
+.next-tone-calm { --orv-next: var(--green); }
+.next-tone-unread { --orv-next: var(--cold); }
+
+/* --------------------- แถบความคืบหน้า (บาง · ติดขอบบนขณะเลื่อน) --------------------- */
+/* รีวิว 13 ต.ค.: แถบระดับ 2 บรรทัด + ชิปค้าง + ความคืบหน้า + คำใบ้ กินจอ ~200px เหนือการ์ด — รวมเป็นแถวเดียว ~44px
+   ติดขอบบนของกล่องเลื่อน: เลื่อนอ่านแชทยาว ๆ แล้วยังเห็น "ตรวจแล้ว 12 / 118" เสมอ */
+
+.odr-bar-host:empty, .odr-panel-host:empty, .odr-banner-host:empty, .odr-bulk-host:empty { display: none; }
+.odr-bar-host {
+  position: sticky; top: 0; z-index: 3;
+  margin: -6px calc(-1 * var(--orv-gutter)) 0; padding: 4px var(--orv-gutter);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 70%, transparent);
+}
+.odr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 36px; }
+.odr-bar .odr-progress { flex: 1 1 90px; min-width: 0; display: grid; gap: 3px; padding: 0; }
+.odr-bar .odr-progress .orv-progress-label { font-size: 13px; white-space: nowrap; }
+.odr-bar .odr-progress .orv-progress-track { height: 4px; }
+.odr-stats {
+  flex: none; min-height: 36px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px 4px 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 12.5px; font-weight: 700; line-height: 1.3; white-space: nowrap; cursor: pointer;
+  transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease);
+}
+.odr-stats:hover { border-color: var(--line-2); color: var(--ink); }
+.odr-stats.is-open { border-color: var(--brand); color: var(--brand-ink); background: var(--brand-50); }
+.odr-stats:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.odr-stats-caret { flex: none; font-size: 15px; line-height: 1; transition: transform 200ms var(--ease); }
+.odr-stats.is-open .odr-stats-caret { transform: rotate(180deg); }
+.odr-taper-line { font-weight: 700; color: var(--ink); }
+
+.odr-taper {
+  display: grid; gap: 10px; padding: 12px 14px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+  font-size: 13.5px; line-height: 1.55; color: var(--ink-2);
+}
+.odr-taper p { margin: 0; }
+.odr-taper-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.odr-taper-stats li { display: grid; gap: 1px; padding: 8px; border-radius: 12px; background: var(--surface-2); text-align: center; }
+.odr-taper-stats strong { font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.odr-taper-stats span { font-size: 11.5px; line-height: 1.35; }
+.odr-taper-codes { font-size: 12.5px; color: var(--ink-3); }
+.odr-pin { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.odr-pin-btn {
+  min-height: 44px; padding: 6px 10px; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 13.5px; font-weight: 600;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.odr-pin-btn.is-active { background: var(--brand-50); color: var(--brand-ink); border-color: var(--brand); }
+.odr-pin-btn:disabled { opacity: 0.55; cursor: default; }
+.odr-pin-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* --------------------------- กำลังเตรียม / คิวใหม่พร้อม --------------------------- */
+
+.odr-building {
+  display: grid; gap: 8px; padding: 10px 14px; border-radius: 14px;
+  background: var(--cold-soft); color: var(--cold-ink); border: 1px solid var(--cold-track, var(--line));
+}
+.odr-building-copy { display: grid; gap: 1px; font-size: 13px; }
+.odr-building-copy strong { font-size: 14px; }
+.odr-building-track { display: block; height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--cold) 22%, transparent); overflow: hidden; }
+.odr-building-fill {
+  display: block; height: 100%; border-radius: inherit; background: var(--cold);
+  transform-origin: left center; transform: scaleX(var(--odr-building, 0)); transition: transform 320ms var(--ease);
+}
+.odr-state .odr-building { width: 100%; max-width: 360px; text-align: left; }
+.odr-newbatch {
+  width: 100%; min-height: 52px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px;
+  padding: 8px 14px; border-radius: 14px; cursor: pointer; text-align: left;
+  border: 1px solid color-mix(in srgb, var(--brand) 45%, var(--line)); background: var(--brand-50); color: var(--brand-ink);
+  font: inherit; font-size: 14px;
+  transition: transform 120ms var(--ease), border-color 150ms var(--ease);
+}
+.odr-newbatch:active { transform: scale(0.98); }
+.odr-newbatch:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ---------------------------------- ค้างตรวจ ---------------------------------- */
+
+.odr-backlog { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.odr-backlog.is-compact { flex: none; }
+.odr-backlog.is-compact .odr-backlog-chip { min-height: 36px; padding: 4px 10px; font-size: 12.5px; white-space: nowrap; }
+.odr-backlog-k { font-size: 12.5px; font-weight: 700; color: var(--ink-3); }
+.odr-backlog-chip {
+  min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px;
+  text-decoration: none; font-size: 13px; color: var(--warm-ink); background: var(--warm-soft);
+  border: 1px solid var(--warm-track, var(--line));
+  transition: transform 120ms var(--ease), border-color 150ms var(--ease);
+}
+.odr-backlog-chip strong { font-variant-numeric: tabular-nums; }
+.odr-backlog-chip.is-home { color: var(--brand-ink); background: var(--brand-50); border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); }
+.odr-backlog-chip:active { transform: scale(0.97); }
+.odr-backlog-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* -------------------------------- ดีที่เหลือทั้งหมด -------------------------------- */
+
+.odr-bulk {
+  width: 100%; min-height: 56px; display: grid; gap: 1px; justify-items: start; padding: 8px 16px;
+  border-radius: 16px; cursor: pointer; text-align: left; font: inherit;
+  color: var(--green); background: var(--green-soft); border: 1.5px solid var(--green-line);
+  transition: transform 120ms var(--ease), border-color 150ms var(--ease), opacity 150ms var(--ease);
+}
+.odr-bulk-main { font-size: 15.5px; font-weight: 700; }
+.odr-bulk-sub { font-size: 12px; color: var(--ink-2); }
+.odr-bulk:hover:not(:disabled) { border-color: var(--green); }
+.odr-bulk:active:not(:disabled) { transform: scale(0.98); }
+.odr-bulk:disabled { opacity: 0.55; cursor: default; }
+.odr-bulk:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+/* สัปดาห์แรก (ตั้งใจตรวจทุกห้อง) = ปุ่มรอง · แตะครั้งแรก = ขอยืนยัน (เขียวเข้ม ตัวอักษรขาว) */
+.odr-bulk.is-quiet { color: var(--ink-2); background: var(--surface); border: 1.5px dashed var(--line-2); }
+.odr-bulk.is-quiet .odr-bulk-main { font-size: 14.5px; }
+.odr-bulk.is-armed { color: var(--surface); background: var(--green); border: 1.5px solid var(--green); }
+.odr-bulk.is-armed .odr-bulk-sub { color: color-mix(in srgb, var(--surface) 85%, transparent); }
+
+/* ---------------------------------- การ์ดห้อง ---------------------------------- */
+
+.odr-card .orv-stamp.is-close { color: var(--warm-ink); background: var(--warm-soft); border-color: var(--warm-ink); }
+/* การ์ดรายวันแน่นกว่าเฟส A เล็กน้อย (อ่าน ~120 ห้อง/คืน — ทุก 10px คือแชทอีกบรรทัด) · กองการ์ดโผล่ขอบน้อยลง */
+.odr-card { gap: 12px; padding-top: 14px; }
+.orv-tab-daily .orv-stack:not(.is-empty) { padding-top: 14px; }
+.orv-tab-daily .orv-stack::before { top: 7px; }
+.odr-head .orv-who { flex: 1 1 auto; min-width: 0; }
+/* ชื่อห้องบรรทัดเดียว (ชื่อเต็มอยู่ใน aria-label ของปุ่ม/แผ่น) — เดิมชื่อยาวขึ้นสองบรรทัดดันแชทลง */
+.odr-card .orv-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.odr-risk {
+  flex: none; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; line-height: 1.3; white-space: nowrap;
+}
+.odr-risk-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.odr-risk.is-risk { color: var(--red); background: var(--red-soft); border: 1px solid var(--red-line); }
+.odr-risk.is-calm { color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); }
+.odr-risk.is-unread { color: var(--cold-ink); background: var(--cold-soft); border: 1px solid var(--cold-track, var(--line)); }
+.odr-tag {
+  display: inline-flex; padding: 0 8px; border-radius: 8px; font-size: 11.5px; font-weight: 700;
+  color: var(--purple); background: var(--purple-soft);
+}
+.odr-tag.is-auto { color: var(--ink-3); background: var(--neutral-soft, var(--surface-2)); }
+
+.odr-ai { display: grid; gap: 8px; }
+.odr-summary {
+  margin: 0; padding-left: 12px; border-left: 3px solid color-mix(in srgb, var(--orv-accent) 70%, transparent);
+  font-size: 15px; line-height: 1.55; color: var(--ink); overflow-wrap: anywhere;
+}
+.odr-k { margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--ink-3); }
+.odr-summary.is-unread { color: var(--cold-ink); }
+.odr-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.odr-chip {
+  min-height: 40px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 13px 4px 6px; border-radius: 999px;
+  cursor: pointer; font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.3;
+  transition: transform 120ms var(--ease), border-color 150ms var(--ease);
+}
+.odr-chip.sev-high { color: var(--red); background: var(--red-soft); border: 1px solid var(--red-line); }
+.odr-chip.sev-normal { color: var(--warm-ink); background: var(--warm-soft); border: 1px solid var(--warm-track, var(--line)); }
+.odr-chip.is-room { border-style: dashed; }
+.odr-chip-mark {
+  width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  font-size: 12px; font-weight: 800; color: var(--surface);
+}
+.odr-chip.sev-high .odr-chip-mark { background: var(--red); color: var(--surface); }
+.odr-chip.sev-normal .odr-chip-mark { background: var(--warm); color: var(--surface); }
+.odr-chip:active { transform: scale(0.96); }
+.odr-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.odr-hint { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.odr-room-issues { display: grid; gap: 6px; }
+
+.odr-notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.odr-notice-btn {
+  min-height: 40px; padding: 4px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid currentColor; background: var(--surface); color: inherit; font: inherit; font-size: 13.5px; font-weight: 700;
+}
+.odr-notice-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.odr-pick-hint {
+  margin: 0; padding: 8px 12px; border-radius: 12px;
+  font-size: 14px; font-weight: 700; text-align: center;
+  color: var(--brand-ink); background: var(--brand-50); border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--line));
+}
+
+/* ---------------------------------- ฟองแชท ---------------------------------- */
+
+.odr-thread { display: grid; gap: 8px; padding: 10px; border-radius: 18px; background: var(--surface-2); }
+.odr-thread-note { margin: 0; text-align: center; font-size: 12.5px; color: var(--ink-3); }
+.odr-msgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.odr-msg { max-width: 88%; min-width: 0; display: grid; gap: 3px; }
+.odr-msg.is-customer { justify-self: start; justify-items: start; }
+.odr-msg.is-ai, .odr-msg.is-team { justify-self: end; justify-items: end; }
+.odr-bubble {
+  position: relative; margin: 0; padding: 8px 12px; border-radius: 16px; color: var(--ink);
+  font-size: 14.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; text-align: left;
+}
+.odr-msg.is-customer .odr-bubble { background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+.odr-msg.is-ai .odr-bubble { background: var(--bubble-ai, var(--brand-50)); border: 1px solid transparent; border-bottom-right-radius: 6px; }
+/* ทีมงาน = แบบที่สาม: เขียวอ่อน ขอบประ (คนจริงตอบ ไม่ใช่ลูกแพร) */
+.odr-msg.is-team .odr-bubble { background: var(--green-soft); border: 1px dashed var(--green-line); border-bottom-right-radius: 6px; }
+.odr-msg.is-team .odr-who { color: var(--green); font-weight: 700; }
+.odr-msg.is-context { opacity: 0.6; }
+.odr-msg.has-issue.sev-high .odr-bubble { box-shadow: 0 0 0 2px var(--red); }
+.odr-msg.has-issue.sev-normal .odr-bubble { box-shadow: 0 0 0 2px var(--warm); }
+/* แตะชิปปัญหา = ฟองที่อ้างถึงกะพริบวงสองครั้ง (opacity ของวงซ้อน ไม่ขยับ layout) */
+.odr-bubble::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 20px; pointer-events: none;
+  border: 3px solid var(--warm); opacity: 0;
+}
+.odr-msg.is-flash .odr-bubble::after { animation: odr-flash 700ms var(--ease) 2; }
+@keyframes odr-flash { 0% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: 0; } }
+.odr-meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; padding: 0 4px; font-size: 11.5px; color: var(--ink-3); }
+.odr-ref { font-variant-numeric: tabular-nums; opacity: 0.75; }
+.odr-divider { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.odr-divider::before, .odr-divider::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+
+/* โหมดเลือกฟองที่ต้องปรับ — ฟองของลูกแพรกลายเป็นปุ่ม (ขอบประสีแบรนด์) ที่เหลือจางลง */
+.odr-bubble-pick {
+  display: grid; gap: 4px; justify-items: end; width: 100%; min-height: 44px; cursor: pointer; font: inherit;
+  border: 2px dashed var(--brand) !important; -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease);
+}
+.odr-bubble-pick .odr-bubble-text { justify-self: stretch; }
+.odr-bubble-pick:hover { background: var(--brand-50); }
+.odr-bubble-pick:active { transform: scale(0.98); }
+.odr-bubble-pick:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.odr-pick-cue { font-size: 12px; font-weight: 700; color: var(--brand-ink); }
+.odr-msg.is-unpickable { opacity: 0.4; }
+/* ฟองที่ AI ชี้ยังมีวงสีในโหมดเลือก + ป้าย "AI ชี้ข้อความนี้" (คนตรวจไม่ต้องหาเอง) */
+.odr-bubble-pick.is-ai-flagged { background: var(--warm-soft); }
+.odr-bubble-pick.is-ai-flagged .odr-pick-cue { color: var(--warm-ink); }
+.odr-msg.has-issue.sev-high .odr-bubble-pick.is-ai-flagged .odr-pick-cue { color: var(--red); }
+
+/* รูปจากคลังที่ลูกแพรส่ง — ขนาดตายตัว ไม่ดัน layout ตอนโหลด */
+.odr-img-wrap { display: grid; gap: 4px; justify-items: start; }
+.odr-img {
+  display: block; width: 160px; height: 120px; max-width: 100%; object-fit: cover;
+  border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line);
+}
+.odr-img-cap { font-size: 12px; font-weight: 600; color: var(--ink-2); overflow-wrap: anywhere; }
+
+/* ปัญหาที่ AI ชี้ใต้ฟอง — บรรทัดเดียว: จุดสี · ชื่อปัญหา · โน้ต (ตัดท้าย แตะอ่านเต็ม) · ถูกไหม ✓ ✕ */
+.odr-issue {
+  width: 100%; max-width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 6px;
+  padding: 0 0 0 4px; border-radius: 12px; background: transparent;
+}
+.odr-issue-main {
+  min-width: 0; min-height: 44px; display: flex; align-items: center; padding: 2px 4px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; line-height: 1.4;
+  text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms var(--ease);
+}
+/* ชื่อ + โน้ตไหลต่อกันเป็นย่อหน้าเดียว ไม่เกิน 2 บรรทัด (แตะ = อ่านเต็ม) */
+.odr-issue-text {
+  min-width: 0; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+span.odr-issue-main { cursor: default; }
+button.odr-issue-main:hover { background: var(--surface-2); }
+button.odr-issue-main:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.odr-issue-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
+.odr-issue.sev-high .odr-issue-dot { background: var(--red); }
+.odr-issue.sev-normal .odr-issue-dot { background: var(--warm); }
+.odr-issue-label { margin-right: 6px; font-weight: 700; }
+.odr-issue.sev-high .odr-issue-label { color: var(--red); }
+.odr-issue.sev-normal .odr-issue-label { color: var(--warm-ink); }
+.odr-issue-note { color: var(--ink-2); }
+.odr-issue.is-open .odr-issue-text { display: block; -webkit-line-clamp: none; overflow: visible; }
+.odr-issue.is-quiet { opacity: 0.85; }
+.odr-room-issues .odr-issue { background: var(--surface); border: 1px solid var(--line); }
+.odr-verdicts { display: inline-flex; align-items: center; gap: 4px; }
+.odr-verdict {
+  min-width: 44px; height: 44px; display: inline-grid; place-items: center; padding: 0 8px; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1; touch-action: manipulation;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease), transform 120ms var(--ease);
+}
+.odr-verdict.is-agree.is-on { color: var(--green); background: var(--green-soft); border-color: var(--green); }
+.odr-verdict.is-disagree.is-on { color: var(--ink); background: var(--neutral-soft); border-color: var(--ink-3); }
+.odr-verdict:active:not(:disabled) { transform: scale(0.96); }
+.odr-verdict:disabled { opacity: 0.55; cursor: default; }
+.odr-verdict:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* -------------------------------- ปุ่มนิ้วโป้ง -------------------------------- */
+
+.odr-act-ico { font-size: 18px; line-height: 1; }
+.orv-act.is-good {
+  color: var(--surface); background: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 70%, var(--ink));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 22px -12px color-mix(in srgb, var(--green) 85%, transparent);
+}
+.orv-act.is-good:hover:not(:disabled) { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 26px -12px color-mix(in srgb, var(--green) 95%, transparent); }
+.orv-act.is-fix { color: var(--warm-ink); background: var(--warm-soft); border: 1.5px solid var(--warm-track, var(--line-2)); box-shadow: var(--shadow-1); }
+.orv-act.is-fix:hover:not(:disabled) { border-color: var(--warm); }
+.orv-act.is-cancel { color: var(--ink-2); background: var(--surface); border: 1.5px solid var(--line-2); }
+.orv-act.is-room { color: var(--brand-ink); background: var(--surface); border: 1.5px solid color-mix(in srgb, var(--brand) 40%, var(--line-2)); }
+
+/* ---------------------------------- หน้าสถานะ ---------------------------------- */
+
+.odr-state-copy { margin: 0; max-width: 38ch; color: var(--ink-2); font-size: 14.5px; line-height: 1.6; }
+.odr-done-mark { font-size: 40px; line-height: 1; }
+.odr-done .orv-empty-title { max-width: 22ch; }
+.odr-tally { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.odr-tally li {
+  min-width: 96px; display: grid; gap: 1px; justify-items: center; padding: 10px 14px; border-radius: 16px;
+  background: var(--surface-2); color: var(--ink-2); font-size: 12.5px;
+}
+.odr-tally strong { font-size: 26px; line-height: 1.15; color: var(--ink); font-variant-numeric: tabular-nums; }
+.odr-tally li.is-good strong { color: var(--green); }
+.odr-tally li.is-fix strong { color: var(--warm-ink); }
+.odr-tally li.is-lesson strong { color: var(--brand-ink); }
+.odr-thanks { margin: 0; max-width: 34ch; color: var(--ink-2); font-size: 14.5px; line-height: 1.65; }
+.odr-done .odr-backlog { justify-content: center; }
+
+/* ------------------------------ แผ่น "ต้องปรับ" ------------------------------ */
+/* รีวิว 13 ต.ค.: แผ่นสูง 743px ที่ 375×812 — คีย์บอร์ดขึ้นแล้วปุ่มบันทึกจม → ส่วนบนเลื่อนได้ ส่วนล่าง (สิ่งที่ลูกแพรจะจำ + ปุ่ม) อยู่กับที่
+   ชั้นของแผ่นสูงตามส่วนที่มองเห็นจริง (visualViewport → --odr-vv-h / --odr-vv-top) แผ่นจึงนั่งบนคีย์บอร์ดพอดี */
+
+.orv-sheet-layer.odr-vv { top: var(--odr-vv-top, 0px); bottom: auto; height: var(--odr-vv-h, 100%); }
+.orv-sheet.odr-fix {
+  display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+  max-height: calc(var(--odr-vv-h, 100dvh) - 12px);
+}
+.odr-fix-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; align-content: start; gap: 12px; margin: 0 -4px; padding: 0 4px 4px;
+}
+.odr-fix-foot { flex: none; display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.odr-fix-actions { grid-template-columns: auto minmax(0, 1fr); align-items: stretch; margin-top: 0; }
+.odr-fix-actions .is-cancel { min-height: 54px; padding-inline: 16px; }
+.odr-fix-learn {
+  margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.odr-fix-learn strong { color: var(--brand-ink); }
+.odr-fix-short { margin: -4px 0 0; font-size: 12.5px; font-weight: 600; color: var(--warm-ink); }
+.odr-fix .orv-goodbye-text { max-height: 28vh; overflow-y: auto; }
+.odr-fix-ai { margin: 0; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; color: var(--warm-ink); background: var(--warm-soft); }
+.odr-fix-chips { margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: 8px; }
+.odr-fix-legend { padding: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.odr-fix-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.odr-fix-chip {
+  min-height: 44px; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line-2); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: 14.5px; font-weight: 600;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease), transform 120ms var(--ease);
+}
+.odr-fix-chip.is-on { color: var(--brand-ink); background: var(--brand-100); border-color: var(--brand); }
+.odr-fix-chip.is-on::before { content: "✓ "; }
+.odr-fix-chip:active:not(:disabled) { transform: scale(0.96); }
+.odr-fix-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.odr-fix-label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.odr-fix-count { font-weight: 500; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+/* 16px = iPhone ไม่ซูมหน้าตอนแตะช่องพิมพ์ */
+.odr-fix-text {
+  width: 100%; min-height: 88px; resize: vertical; padding: 10px 12px; border-radius: 14px;
+  border: 1.5px solid var(--line-2); background: var(--surface-2); color: var(--ink);
+  font: inherit; font-size: 16px; line-height: 1.5;
+  transition: border-color 150ms var(--ease);
+}
+.odr-fix-text:focus { outline: none; border-color: var(--brand); box-shadow: var(--ring, 0 0 0 3px var(--brand-100)); }
+.odr-fix-copy { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.orv-sheet-btn.odr-fix-save {
+  color: var(--on-brand); background: var(--brand); border-color: color-mix(in srgb, var(--brand) 70%, var(--ink));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ---------------------------------- ลดโมชัน ---------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .odr-msg.is-flash .odr-bubble { outline: 3px solid var(--warm); outline-offset: 3px; }
+}
+@media (max-width: 360px) {
+  .odr-msg { max-width: 94%; }
+  .odr-backlog.is-compact .odr-backlog-day { display: none; }
+  .odr-bar { gap: 6px; }
+}

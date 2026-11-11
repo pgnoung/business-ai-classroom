@@ -1,0 +1,82 @@
+/* kpi.css — ภาพสรุปบนสุดของหน้าผลงาน (kpiVisual.mjs) + ปุ่มช่วงวัน — 28 ก.ย. 2026
+   token ของธีมเท่านั้น ใช้ได้ทุก instance · แท่ง/วงแหวนขยับด้วย transform เท่านั้น */
+
+.kpi-chips {
+  display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; width: fit-content; max-width: 100%;
+  background: var(--surface-2); border: 1px solid var(--line); overflow-x: auto;
+}
+.kpi-chips .chip {
+  min-height: 36px; padding: 6px 14px; border: 0; border-radius: 9px; cursor: pointer; font: inherit;
+  font-size: 13.5px; font-weight: 600; background: transparent; color: var(--ink-2);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.kpi-chips .chip:hover { color: var(--ink); background: var(--surface); }
+.kpi-chips .chip.chip-on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
+/* จอ 390px: ตารางเดิมตั้ง nowrap ไว้ — ถ้าไม่ให้ลูกของ grid หดได้ (min-width: 0) ตารางจะดันทั้งหน้า
+   ให้เลื่อนซ้ายขวา (เป็นมาตั้งแต่ก่อนรอบนี้) ตอนนี้ตารางเลื่อนเฉพาะในกล่อง .kpi-scroll ของมันเอง */
+.kpi-page { padding: 18px 14px 32px; }
+.kpi-page > *, .kpi-page .block, .kpi-page .kpi-block { min-width: 0; }
+@media (min-width: 1024px) { .kpi-page { padding: 24px 10px 40px; } }
+.kpi-page .kb-lede { margin: 0; }
+/* ตารางละเอียดเดิม: บล็อกเต็มความกว้างคอลัมน์เดียวกับภาพสรุป + หัวข้อขนาดเดียวกันทั้งหน้า */
+.kpi-page .block { margin: 0; }
+.kpi-page .block > h2 { margin: 0; font-size: 17px; line-height: 1.4; font-weight: 700; }
+.kpi-page .kpi-block h3 { font-size: 14px; font-weight: 700; }
+
+.kpi-visual { display: grid; gap: 14px; }
+.kv-card {
+  display: grid; gap: 12px; align-content: start; padding: 16px 18px; min-width: 0;
+  border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+}
+.kv-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+.kv-note { margin: 0; font-size: 12px; color: var(--ink-3); }
+
+.kv-speed { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.kv-speed-who { font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.kv-bar { position: relative; height: 12px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.kv-bar-fill {
+  position: absolute; inset: 0; border-radius: inherit; transform-origin: left center;
+  background: var(--brand); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.kv-speed.is-human .kv-bar-fill { background: var(--green); }
+.kv-speed-value { display: grid; justify-items: end; line-height: 1.25; }
+.kv-speed-value strong { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kv-speed-value small { font-size: 11.5px; color: var(--ink-3); }
+
+.kv-big { margin: 0; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.kv-big strong { font-size: 34px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kv-big > span:not(.kv-big-sub) { color: var(--ink-2); }
+.kv-big-sub { margin-left: auto; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--green-soft); color: var(--green); }
+.kv-big-sub.is-alert { background: var(--danger-soft); color: var(--danger); }
+.kv-stack { display: flex; height: 14px; border-radius: 999px; overflow: hidden; gap: 2px; background: var(--surface-2); }
+.kv-stack.is-empty { background: transparent; border: 1px dashed var(--line-2); }
+.kv-stack-part { flex: 0 1 0; min-width: 0; }
+.kv-stack-part.tone-calm, .kv-legend .tone-calm .kv-legend-dot { background: var(--green); }
+.kv-stack-part.tone-soft, .kv-legend .tone-soft .kv-legend-dot { background: var(--warm); }
+.kv-stack-part.tone-warn, .kv-legend .tone-warn .kv-legend-dot { background: var(--orange); }
+.kv-stack-part.tone-urgent, .kv-legend .tone-urgent .kv-legend-dot { background: var(--danger); }
+.kv-legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; }
+.kv-legend li { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+.kv-legend strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.kv-legend-dot { width: 9px; height: 9px; border-radius: 3px; }
+
+.kv-rings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.kv-ring { display: grid; justify-items: center; gap: 4px; text-align: center; }
+.kv-ring-figure { position: relative; width: 88px; height: 88px; display: grid; place-items: center; }
+.kv-ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kv-ring-track { fill: none; stroke: var(--surface-2); stroke-width: 8; }
+.kv-ring-value { fill: none; stroke: var(--brand); stroke-width: 8; stroke-linecap: round; }
+.kv-ring.is-hybrid .kv-ring-value { stroke: var(--green); }
+.kv-ring.is-thin .kv-ring-track { stroke-dasharray: 2 4; stroke: var(--line-2); stroke-width: 5; }
+.kv-ring-pct { position: relative; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kv-ring-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.kv-ring-sample { font-size: 12px; color: var(--ink-3); }
+
+.kpi-detail-head { margin: 10px 2px -4px; font-size: 16px; font-weight: 700; color: var(--ink-2); }
+
+@media (min-width: 900px) {
+  .kpi-visual { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-bar-fill { transition: none; }
+}

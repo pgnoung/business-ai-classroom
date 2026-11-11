@@ -1,0 +1,793 @@
+{
+ "name": "⚡ Content Studio — แคปชัน · ทำรูป · โพสต์/ตั้งเวลา",
+ "flow": [
+  {
+   "id": 1,
+   "module": "gateway:CustomWebHook",
+   "version": 1,
+   "mapper": {},
+   "parameters": {
+    "maxResults": 1
+   },
+   "metadata": {
+    "designer": {
+     "x": 0,
+     "y": 0
+    },
+    "notes": [
+     {
+      "text": "กด Add สร้าง webhook ใหม่ ตั้งชื่ออะไรก็ได้ → Save → Copy address แล้วไปวางในเว็บ Content Studio ช่อง 'ลิงก์ Make'"
+     }
+    ]
+   }
+  },
+  {
+   "id": 2,
+   "module": "builtin:BasicRouter",
+   "version": 1,
+   "mapper": null,
+   "routes": [
+    {
+     "flow": [
+      {
+       "id": 10,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"pong\": true, \"kit\": \"content-studio-quick\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": -300
+        }
+       },
+       "filter": {
+        "name": "action = ping",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "ping"
+          }
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 20,
+       "module": "openai-gpt-3:CreateCompletion",
+       "version": 1,
+       "parameters": {},
+       "filter": {
+        "name": "action = caption",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "caption"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "select": "chat",
+        "model": "gpt-4.1",
+        "messages": [
+         {
+          "role": "system",
+          "content": "คุณคือแอดมินเพจมือโปรของร้านค้าไทย เขียนแคปชันโพสต์ Facebook ภาษาไทย 3 แบบจากข้อมูลร้านและเรื่องที่ได้รับ\n\nกติกา\n1. บรรทัดแรกต้องทำให้คนหยุดอ่าน เพราะ Facebook บนมือถือโชว์แค่ราว 3 บรรทัดก่อนคำว่า \"ดูเพิ่มเติม\"\n2. 3 แบบต้องต่างแนวกันชัด: แบบแรกขายตรง เน้นประโยชน์ที่ลูกค้าได้ · แบบที่สองเล่าเรื่องใกล้ตัวลูกค้า · แบบที่สามสั้น สนุก แชร์ง่าย\n3. ใช้น้ำเสียงของร้านตามที่บอก ยาว 3–8 บรรทัด ประโยคสั้น อีโมจิพอดี ๆ ห้ามใช้ตัวหนา ดอกจัน หรือ markdown\n4. ใช้เฉพาะข้อมูลที่ให้มา ห้ามแต่งราคา โปรโมชั่น ส่วนลด หรือสรรพคุณที่ไม่ได้บอก และห้ามใช้คำที่ร้านห้าม\n5. ปิดด้วยคำปิดท้ายของร้านแบบคัดลอกตรงตัว แล้วตามด้วยแฮชแท็ก 3–5 อัน (ใช้แฮชแท็กประจำร้านก่อน)\n6. จัดบรรทัดแบบโพสต์ Facebook จริง: ขึ้นบรรทัดใหม่ (\\n) ทุก 1–2 ประโยค · คำปิดท้ายอยู่บรรทัดของตัวเอง · เว้น 1 บรรทัดว่าง (\\n\\n) ก่อนแฮชแท็ก\n\nตอบเป็น JSON เท่านั้น รูปแบบ {\"captions\": [\"แบบที่ 1\", \"แบบที่ 2\", \"แบบที่ 3\"]} โดยใช้ \\n ขึ้นบรรทัดภายในแต่ละแบบ"
+         },
+         {
+          "role": "user",
+          "content": "ร้าน: {{1.shop}}\nขายอะไร: {{1.sells}}\nลูกค้าหลัก: {{1.audience}}\nน้ำเสียงของร้าน: {{1.tone}}\nคำปิดท้าย / ช่องทางติดต่อ: {{1.signoff}}\nแฮชแท็กประจำร้าน: {{1.hashtags}}\nคำที่ห้ามใช้: {{1.avoid}}\n\nโพสต์นี้เกี่ยวกับ: {{1.brief}}\nรายละเอียดเพิ่ม: {{1.extra}}"
+         }
+        ],
+        "max_tokens": 1600,
+        "temperature": 0.9,
+        "top_p": 1,
+        "n_completions": 1,
+        "response_format": "json_object",
+        "parseJSONResponse": false
+       },
+       "onerror": [
+        {
+         "id": 25,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"caption_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": -100
+          }
+         }
+        },
+        {
+         "id": 26,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": -100
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 0
+        },
+        "notes": [
+         {
+          "text": "ต่อ OpenAI ของตัวเอง (API key ของตัวเอง) · อยากเปลี่ยนสไตล์แคปชัน แก้ข้อความ system ในกล่องนี้ได้เลย"
+         }
+        ]
+       }
+      },
+      {
+       "id": 21,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{{20.result}}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 0
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 40,
+       "module": "openai-gpt-3:GenerateImage",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "n": 1,
+        "size": "{{ifempty(1.size; \"1024x1280\")}}",
+        "model": "gpt-image-2-2026-04-21",
+        "prompt": "{{1.prompt}}",
+        "quality": "{{ifempty(1.quality; \"medium\")}}",
+        "background": "opaque",
+        "output_format": "jpeg",
+        "output_compression": 82
+       },
+       "filter": {
+        "name": "ทำรูป · รูปอ้างอิง 0 รูป",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "image"
+          },
+          {
+           "a": "{{1.ref1_b64}}",
+           "o": "notexist"
+          }
+         ]
+        ]
+       },
+       "onerror": [
+        {
+         "id": 45,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"image_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": 420
+          }
+         }
+        },
+        {
+         "id": 46,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": 420
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 300
+        },
+        "notes": [
+         {
+          "text": "4 กล่องทำรูปใช้ OpenAI connection เดียวกัน (แยกตามจำนวนรูปอ้างอิง 0–3 รูป)"
+         }
+        ]
+       }
+      },
+      {
+       "id": 41,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"b64\": \"{{base64(40.resImgData)}}\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 300
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 50,
+       "module": "openai-gpt-3:editImage",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "n": 1,
+        "size": "{{ifempty(1.size; \"1024x1280\")}}",
+        "model": "gpt-image-2-2026-04-21",
+        "prompt": "{{1.prompt}}\n\nภาพอ้างอิงที่แนบมาคือของจริงของร้าน (โลโก้ / สินค้า / คน) ใช้ให้ตรงตามภาพ ถ้ามีโลโก้ต้องคงรูปและสีเดิมให้อ่านออก ห้ามวาดโลโก้ใหม่หรือเดาแบรนด์ ตัวหนังสือไทยบนภาพต้องสะกดถูกและอ่านง่าย",
+        "quality": "{{ifempty(1.quality; \"medium\")}}",
+        "background": "opaque",
+        "output_format": "jpeg",
+        "output_compression": 82,
+        "image": [
+         {
+          "fileData": "{{toBinary(1.ref1_b64; \"base64\")}}",
+          "fileName": "ref1.jpg"
+         }
+        ]
+       },
+       "filter": {
+        "name": "ทำรูป · รูปอ้างอิง 1 รูป",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "image"
+          },
+          {
+           "a": "{{1.ref1_b64}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.ref2_b64}}",
+           "o": "notexist"
+          }
+         ]
+        ]
+       },
+       "onerror": [
+        {
+         "id": 55,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"image_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": 670
+          }
+         }
+        },
+        {
+         "id": 56,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": 670
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 550
+        }
+       }
+      },
+      {
+       "id": 51,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"b64\": \"{{base64(50.resImgData)}}\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 550
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 60,
+       "module": "openai-gpt-3:editImage",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "n": 1,
+        "size": "{{ifempty(1.size; \"1024x1280\")}}",
+        "model": "gpt-image-2-2026-04-21",
+        "prompt": "{{1.prompt}}\n\nภาพอ้างอิงที่แนบมาคือของจริงของร้าน (โลโก้ / สินค้า / คน) ใช้ให้ตรงตามภาพ ถ้ามีโลโก้ต้องคงรูปและสีเดิมให้อ่านออก ห้ามวาดโลโก้ใหม่หรือเดาแบรนด์ ตัวหนังสือไทยบนภาพต้องสะกดถูกและอ่านง่าย",
+        "quality": "{{ifempty(1.quality; \"medium\")}}",
+        "background": "opaque",
+        "output_format": "jpeg",
+        "output_compression": 82,
+        "image": [
+         {
+          "fileData": "{{toBinary(1.ref1_b64; \"base64\")}}",
+          "fileName": "ref1.jpg"
+         },
+         {
+          "fileData": "{{toBinary(1.ref2_b64; \"base64\")}}",
+          "fileName": "ref2.jpg"
+         }
+        ]
+       },
+       "filter": {
+        "name": "ทำรูป · รูปอ้างอิง 2 รูป",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "image"
+          },
+          {
+           "a": "{{1.ref2_b64}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.ref3_b64}}",
+           "o": "notexist"
+          }
+         ]
+        ]
+       },
+       "onerror": [
+        {
+         "id": 65,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"image_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": 920
+          }
+         }
+        },
+        {
+         "id": 66,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": 920
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 800
+        }
+       }
+      },
+      {
+       "id": 61,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"b64\": \"{{base64(60.resImgData)}}\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 800
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 70,
+       "module": "openai-gpt-3:editImage",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "n": 1,
+        "size": "{{ifempty(1.size; \"1024x1280\")}}",
+        "model": "gpt-image-2-2026-04-21",
+        "prompt": "{{1.prompt}}\n\nภาพอ้างอิงที่แนบมาคือของจริงของร้าน (โลโก้ / สินค้า / คน) ใช้ให้ตรงตามภาพ ถ้ามีโลโก้ต้องคงรูปและสีเดิมให้อ่านออก ห้ามวาดโลโก้ใหม่หรือเดาแบรนด์ ตัวหนังสือไทยบนภาพต้องสะกดถูกและอ่านง่าย",
+        "quality": "{{ifempty(1.quality; \"medium\")}}",
+        "background": "opaque",
+        "output_format": "jpeg",
+        "output_compression": 82,
+        "image": [
+         {
+          "fileData": "{{toBinary(1.ref1_b64; \"base64\")}}",
+          "fileName": "ref1.jpg"
+         },
+         {
+          "fileData": "{{toBinary(1.ref2_b64; \"base64\")}}",
+          "fileName": "ref2.jpg"
+         },
+         {
+          "fileData": "{{toBinary(1.ref3_b64; \"base64\")}}",
+          "fileName": "ref3.jpg"
+         }
+        ]
+       },
+       "filter": {
+        "name": "ทำรูป · รูปอ้างอิง 3 รูป",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "image"
+          },
+          {
+           "a": "{{1.ref3_b64}}",
+           "o": "exist"
+          }
+         ]
+        ]
+       },
+       "onerror": [
+        {
+         "id": 75,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"image_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": 1170
+          }
+         }
+        },
+        {
+         "id": 76,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": 1170
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1050
+        }
+       }
+      },
+      {
+       "id": 71,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"b64\": \"{{base64(70.resImgData)}}\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 1050
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 30,
+       "module": "facebook-pages:CreatePostWithPhotos",
+       "version": 6,
+       "parameters": {},
+       "filter": {
+        "name": "action = post",
+        "conditions": [
+         [
+          {
+           "a": "{{1.action}}",
+           "o": "text:equal",
+           "b": "post"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "date": "{{if(1.publish_date; parseDate(1.publish_date; \"x\"))}}",
+        "photos": [
+         {
+          "type": "data",
+          "data": "{{toBinary(1.image_b64; \"base64\")}}",
+          "fileName": "post.jpg"
+         }
+        ],
+        "message": "{{1.caption}}",
+        "page_id": ""
+       },
+       "onerror": [
+        {
+         "id": 35,
+         "module": "gateway:WebhookRespond",
+         "version": 1,
+         "parameters": {},
+         "mapper": {
+          "status": "200",
+          "body": "{\"ok\": false, \"error\": \"post_failed\"}",
+          "headers": [
+           {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+           },
+           {
+            "key": "Content-Type",
+            "value": "application/json; charset=utf-8"
+           }
+          ]
+         },
+         "metadata": {
+          "designer": {
+           "x": 600,
+           "y": 1500
+          }
+         }
+        },
+        {
+         "id": 36,
+         "module": "builtin:Ignore",
+         "version": 1,
+         "mapper": {},
+         "metadata": {
+          "designer": {
+           "x": 900,
+           "y": 1500
+          }
+         }
+        }
+       ],
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1350
+        },
+        "notes": [
+         {
+          "text": "ต่อ Facebook ของตัวเอง แล้วเลือกเพจที่จะโพสต์ · ช่อง Date มีสูตรให้แล้ว: เว็บส่งเวลามา = ตั้งเวลา / ไม่ส่ง = โพสต์ทันที"
+         }
+        ]
+       }
+      },
+      {
+       "id": 31,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": "200",
+        "body": "{\"ok\": true, \"id\": \"{{30.id}}\", \"mode\": \"{{if(1.publish_date; \"scheduled\"; \"now\")}}\"}",
+        "headers": [
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+         },
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 1350
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   }
+  }
+ ],
+ "metadata": {
+  "instant": true,
+  "version": 1,
+  "designer": {
+   "orphans": []
+  }
+ }
+}

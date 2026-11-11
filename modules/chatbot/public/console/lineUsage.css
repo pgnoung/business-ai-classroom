@@ -1,0 +1,101 @@
+/* lineUsage.css — การ์ด "LINE OA เดือนนี้" (28 ก.ย. 2026)
+   token ของธีมเท่านั้น (ทุก instance ใช้ร่วม · โหมดมืดตามธีม) · แถบโควตาขยับด้วย transform เท่านั้น
+   สีสื่อความหมาย: ส่งเข้าทีม = ส้ม (ต้นทุนภายในที่ย้ายได้) · บรอดแคสต์ = ม่วง · ส่งหาลูกค้า = สีหลัก ·
+   ก่อนเริ่มแยกประเภท = สีหลักลายทาง · ยังแยกไม่ได้ = เส้นจาง */
+
+.lu-card { display: grid; gap: 16px; min-width: 0; }
+.lu-card > * { min-width: 0; }
+.lu-head { align-items: flex-start; flex-wrap: wrap; margin-bottom: 0; }
+.lu-head-text { display: grid; gap: 2px; min-width: 0; flex: 1 1 220px; }
+.lu-card .kpi-hero-title { margin: 0; }
+.lu-lede { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.lu-month { min-height: 36px; }
+
+.lu-top { display: grid; gap: 14px; }
+
+/* ---- โควตา ---- */
+.lu-quota { display: grid; gap: 8px; align-content: start; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); }
+.lu-quota-top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.lu-quota-value { font-size: 30px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--ink); }
+.lu-quota-value small { font-size: 15px; font-weight: 600; color: var(--ink-3); }
+.lu-quota-left { font-size: 13px; font-weight: 600; color: var(--green); }
+.lu-quota-track { position: relative; display: block; height: 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.lu-quota-fill {
+  position: absolute; inset: 0; border-radius: inherit; transform-origin: left center;
+  background: var(--green); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lu-quota-fill.is-warn { background: var(--orange); }
+.lu-quota-fill.is-bad { background: var(--danger); }
+.lu-quota-note { margin: 0; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
+
+/* ---- โควตาไปไหน ---- */
+.lu-split { display: grid; gap: 10px; align-content: start; }
+.lu-subtitle { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--ink-2); }
+.lu-split-bar { display: flex; gap: 2px; height: 16px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+.lu-split-bar.is-empty { background: transparent; border: 1px dashed var(--line-2); }
+.lu-seg { flex: 0 1 0; min-width: 4px; }
+.lu-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lu-legend-item { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.lu-dot { width: 10px; height: 10px; margin-top: 5px; border-radius: 3px; }
+.lu-legend-text { display: grid; gap: 1px; min-width: 0; }
+.lu-legend-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.lu-legend-text small { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+.lu-legend-num { display: grid; justify-items: end; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.lu-legend-num small { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+
+.lu-seg.is-team, .is-team > .lu-dot { background: var(--orange); }
+.lu-seg.is-broadcast, .is-broadcast > .lu-dot { background: var(--purple); }
+.lu-seg.is-customers, .is-customers > .lu-dot { background: var(--brand); }
+/* ก่อนเริ่มแยกประเภท = ข้อความของระบบที่ยังแยกไม่ได้ว่าไปหาใคร — สีเดียวกับ "ส่งหาลูกค้า" แต่เป็นลายทาง */
+.lu-seg.is-unsplit, .is-unsplit > .lu-dot {
+  background: repeating-linear-gradient(135deg, var(--brand) 0 3px, color-mix(in srgb, var(--brand) 30%, transparent) 3px 6px);
+}
+.lu-seg.is-other, .is-other > .lu-dot { background: var(--warm); }
+.lu-seg.is-unknown, .is-unknown > .lu-dot { background: var(--line-2); }
+
+/* ---- สองฝั่งที่มา ---- */
+.lu-cols { display: grid; gap: 14px; }
+.lu-col {
+  display: grid; gap: 8px; align-content: start; min-width: 0;
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+}
+.lu-rows { list-style: none; margin: 0; padding: 0; display: grid; }
+.lu-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 10px; align-items: center;
+  padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink);
+}
+.lu-row:last-child { border-bottom: 0; }
+.lu-row.is-zero { color: var(--ink-3); }
+.lu-row-label { min-width: 0; line-height: 1.45; }
+.lu-row-sub { font-size: 11.5px; color: var(--ink-3); }
+.lu-row-num { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+.lu-tag { padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.lu-tag.is-counted { background: var(--orange-soft); color: var(--orange); }
+.lu-tag.is-free { background: var(--green-soft); color: var(--green); }
+.lu-row.is-zero .lu-tag { opacity: 0.7; }
+.lu-details { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0 0 0 14px; display: grid; gap: 2px; font-size: 12px; color: var(--ink-2); }
+.lu-details li { display: flex; justify-content: space-between; gap: 10px; }
+.lu-foot { margin: 0; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
+.lu-foot.is-strong { font-weight: 600; color: var(--ink-2); }
+.lu-foot.is-hint { color: var(--ink-2); }
+
+/* ---- รายวัน / ค่าใช้จ่าย / หมายเหตุ ---- */
+.lu-days, .lu-plan { margin-top: 0; }
+.lu-table tr.is-untracked th, .lu-table tr.is-untracked td { color: var(--ink-3); }
+.lu-day-since { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.lu-cost { display: grid; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); }
+.lu-cost-main { margin: 0; font-size: 14px; color: var(--ink-2); }
+.lu-cost-main strong { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.lu-plan-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.lu-notes { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
+
+@media (min-width: 560px) {
+  .lu-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+}
+@media (min-width: 900px) {
+  .lu-top { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr); align-items: start; }
+  .lu-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lu-quota-fill { transition: none; }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "LuKprae Console",
+  "short_name": "ลูกแพร",
+  "description": "คอนโซลดูแลลูกค้า LINE OA ของพี่ง้วง ติดกระดุม",
+  "lang": "th",
+  "start_url": "/console/",
+  "scope": "/console/",
+  "display": "standalone",
+  "background_color": "#F4F7FC",
+  "theme_color": "#030815",
+  "icons": [
+    {
+      "src": "/console/static/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/console/static/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+:root {
+    --ink: #2d2a32; --ink-2: #5f5a66; --line: #eadfe3; --brand: #c94f6d;
+    --surface: #fff; --bg: #fdf7f8; --blue: #2563eb; --purple: #7c3aed; --green: #16a34a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Noto Sans Thai", "Sukhumvit Set", sans-serif;
+    line-height: 1.75; font-size: 16px;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--ink-2); margin: 0 0 28px; }
+  h2 { font-size: 20px; margin: 36px 0 10px; color: var(--brand); }
+  h3 { font-size: 16.5px; margin: 22px 0 6px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; margin: 14px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); }
+  .chip { display: inline-block; border-radius: 999px; padding: 2px 12px; font-size: 13.5px; font-weight: 600; margin: 2px; }
+  .chip-rfm { background: #e5edff; color: var(--blue); }
+  .chip-ai { background: #f0e9ff; color: var(--purple); }
+  .chip-human { background: #e5f7ea; color: var(--green); }
+  pre {
+    background: #f7f2f4; border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; white-space: pre-wrap; font-size: 14.5px;
+    font-family: inherit; position: relative;
+  }
+  .copy-btn {
+    position: absolute; top: 10px; right: 10px; border: 1px solid var(--line);
+    background: var(--surface); border-radius: 8px; padding: 4px 12px; cursor: pointer;
+    font-family: inherit; font-size: 13px; color: var(--ink-2);
+  }
+  .copy-btn:hover { border-color: var(--brand); color: var(--brand); }
+  .warn { border-left: 4px solid #eab308; padding-left: 14px; color: var(--ink-2); }
+  a { color: var(--brand); }
+
+.tight { margin-bottom: 0; }
+.back-link { margin-top: 36px; }
+
+/* 28 ก.ย. 2026: ตารางมิติสด + ธีมมืดตามเครื่อง (หน้านี้เปิดแท็บใหม่ ไม่มีสวิตช์ธีมของคอนโซล) */
+ul { margin: 0 0 12px; padding-left: 22px; }
+li { margin: 4px 0; }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; }
+.value-list { display: flex; flex-wrap: wrap; gap: 2px; }
+.dim-card { padding: 12px 0; border-top: 1px solid var(--line); }
+.dim-card:first-child { border-top: none; padding-top: 2px; }
+.dim-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dim-key { font-size: 16.5px; }
+.dim-label { color: var(--ink-2); font-size: 14px; }
+.dim-rule { margin: 2px 0 6px; font-size: 14px; color: var(--ink-2); }
+@media (max-width: 480px) {
+  main { padding: 24px 14px 64px; }
+  .card { padding: 14px 16px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: #f3e9ee; --ink-2: #c9b8c2; --line: #4a3a44; --brand: #f08aa6; --surface: #2a1f27; --bg: #1d151b; }
+  pre { background: #33262f; }
+  .chip-rfm { background: #22314f; color: #a9c4ff; }
+  .chip-ai { background: #35284f; color: #d3bdff; }
+  .chip-human { background: #1f3a2b; color: #9be0b4; }
+  .copy-btn { color: var(--ink-2); }
+}

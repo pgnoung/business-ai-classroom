@@ -1,0 +1,174 @@
+/* steps.css — ข้อความตามขั้น (Step messages) ในหน้าบรอดแคสต์ (28 ก.ย. 2026)
+   ต่อยอดภาษาภาพของ studio.css: เส้นเวลาแนวตั้ง = ลำดับที่ลูกค้าได้รับจริง · สถานะใช้สีสื่อความหมาย
+   (ทำงาน = เขียว · พัก = ส้ม · ร่าง = เส้นประ · ปิด = จาง) · token ของธีมเท่านั้น · ไม่มี inline style (CSP) */
+
+.sm-page { display: grid; gap: 16px; min-width: 0; }
+
+/* ---------------------------------- สวิตช์รวม ---------------------------------- */
+.sm-modebar {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-wrap: wrap;
+  border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+}
+.sm-modebar.is-on { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); background: color-mix(in srgb, var(--green-soft) 55%, var(--surface)); }
+.sm-modebar.is-idle { border-color: color-mix(in srgb, var(--orange) 40%, var(--line)); background: color-mix(in srgb, var(--orange-soft) 45%, var(--surface)); }
+.sm-modebar.is-off { background: var(--surface-2); }
+.sm-mode-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
+.sm-modebar.is-on .sm-mode-dot { background: var(--green); box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 45%, transparent); animation: sm-pulse 2.4s var(--ease) infinite; }
+.sm-modebar.is-idle .sm-mode-dot { background: var(--orange); }
+@keyframes sm-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 45%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.sm-mode-copy { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.sm-mode-copy strong { font-size: 13.5px; }
+.sm-mode-copy span { font-size: 12.5px; color: var(--ink-2); line-height: 1.45; }
+.sm-mode-toggle { flex-shrink: 0; }
+
+/* ---------------------------------- รายการ ---------------------------------- */
+.sm-list { display: grid; gap: 14px; }
+.sm-list-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+.sm-list-head .block-title { font-size: 17px; }
+.sm-new { min-height: 42px; }
+.sm-starters { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.sm-starters .bs-chip { text-decoration: none; }
+.sm-seq-grid { display: grid; gap: 12px; }
+@media (min-width: 900px) { .sm-seq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sm-seq-card {
+  position: relative; display: grid; gap: 10px; align-content: start; padding: 16px 16px 14px; min-width: 0;
+  border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-1);
+  transition: border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.sm-seq-card::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; border-radius: 18px 0 0 18px; background: var(--line-2);
+}
+.sm-seq-card.is-active::before { background: var(--green); }
+.sm-seq-card.is-paused::before { background: var(--orange); }
+.sm-seq-card.is-draft { border-style: dashed; box-shadow: none; }
+.sm-seq-card.is-archived { opacity: 0.72; box-shadow: none; }
+.sm-seq-card:hover { border-color: var(--line-2); transform: translateY(-1px); box-shadow: var(--shadow-2); }
+.sm-seq-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; }
+.sm-status { padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.sm-status.is-active { background: var(--green-soft); color: var(--green); }
+.sm-status.is-paused { background: var(--orange-soft); color: var(--orange); }
+.sm-status.is-draft { background: var(--surface-2); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); }
+.sm-trigger-chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 2px 10px; border-radius: 999px;
+  background: var(--purple-soft); color: var(--purple); font-size: 12px; font-weight: 600; overflow-wrap: anywhere;
+}
+.sm-seq-name { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.35; }
+.sm-seq-name a { color: var(--ink); text-decoration: none; }
+.sm-seq-name a:hover, .sm-seq-name a:focus-visible { color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; }
+.sm-mini-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 4px; }
+.sm-mini-steps li {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 999px;
+  background: var(--surface-2); font-size: 11.5px; color: var(--ink-2);
+}
+.sm-mini-dot {
+  display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--line-2); font-size: 11px; font-weight: 700; color: var(--ink);
+}
+.sm-seq-totals { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--ink-2); }
+.sm-seq-totals strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.sm-seq-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.sm-seq-actions .btn { text-decoration: none; }
+.sm-empty { display: grid; gap: 6px; padding: 22px; }
+.sm-empty strong { font-size: 15px; color: var(--ink); }
+.sm-empty p { margin: 0; }
+.sm-archived > summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); padding: 4px 0 10px; }
+.sm-oa-note { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+
+/* ---------------------------------- ตัวแก้ ---------------------------------- */
+.sm-trigger-panel { min-width: 0; }
+.sm-hash-input { display: flex; align-items: stretch; max-width: 360px; }
+.sm-hash {
+  display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-right: 0;
+  border-radius: 10px 0 0 10px; background: var(--surface-2); color: var(--brand-ink); font-weight: 700;
+}
+.sm-hash-input .bs-input { border-radius: 0 10px 10px 0; }
+.sm-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; position: relative; }
+.sm-timeline::before {
+  content: ""; position: absolute; top: 18px; bottom: 18px; left: 25px; width: 2px; border-radius: 2px;
+  background: linear-gradient(var(--line-2), color-mix(in srgb, var(--brand) 35%, var(--line-2)));
+}
+.sm-step {
+  position: relative; display: grid; gap: 12px; padding: 12px 14px; min-width: 0;
+  border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+}
+.sm-step.is-active { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand), var(--shadow-1); }
+.sm-step.is-incomplete:not(.is-active) { border-style: dashed; }
+.sm-step-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.sm-step-dot {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 700;
+}
+.sm-step.is-active .sm-step-dot { background: var(--brand); color: var(--on-brand); }
+.sm-step-title { display: grid; gap: 1px; min-width: 0; }
+.sm-step-title strong { font-size: 14px; }
+.sm-wait { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sm-step-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-width: 0;
+  padding: 8px 10px; border: 0; border-radius: 10px; background: var(--surface-2); color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+}
+.sm-step-summary:hover, .sm-step-summary:focus-visible { background: var(--brand-50); }
+.sm-step-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.sm-step-open { flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--brand-ink); }
+.sm-delay { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+.sm-delay-kinds { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.sm-delay-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.sm-delay-fields { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 13.5px; color: var(--ink-2); }
+.sm-delay .block-hint { margin: 0; }
+.bs-input.sm-num { width: 84px; }
+.bs-input.sm-time { width: 124px; }
+.sm-cond { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.sm-cond-head { cursor: pointer; padding: 10px 12px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.sm-condition { display: grid; gap: 10px; padding: 0 12px 12px; }
+.sm-cond-row { display: grid; gap: 6px; }
+.sm-cond-label { font-size: 12px; font-weight: 700; color: var(--ink-3); }
+.bs-select.sm-tag-select { width: auto; max-width: 100%; min-height: 32px; border-radius: 999px; padding: 4px 10px; font-size: 12.5px; }
+.sm-add-step { justify-self: start; }
+.sm-rule-grid { display: grid; gap: 10px; }
+@media (min-width: 720px) { .sm-rule-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sm-rule-box { display: grid; gap: 8px; align-content: start; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); }
+.sm-rule-title { font-size: 13px; }
+.sm-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 12.5px; color: var(--ink-2); }
+.sm-rules li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 6px; }
+.sm-rules li::before { content: "✓"; color: var(--green); font-weight: 700; }
+.sm-preview-label { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-align: center; }
+.sm-problems { min-width: 0; }
+.sm-problem-list { margin: 0; padding: 10px 12px 10px 28px; border-radius: 12px; background: var(--orange-soft); color: var(--orange); font-size: 12.5px; display: grid; gap: 4px; }
+.sm-ready { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--green-soft); color: var(--green); font-size: 12.5px; font-weight: 600; }
+
+/* ---------------------------------- ผลรายขั้น ---------------------------------- */
+.sm-detail-head { gap: 8px; }
+.sm-back { width: fit-content; font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; }
+.sm-back:hover { color: var(--brand-ink); }
+.sm-detail-title { margin: 0; font-size: clamp(19px, 1vw + 14px, 23px); font-weight: 700; line-height: 1.3; }
+.sm-archive { color: var(--danger); }
+.sm-stats { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sm-stat-row { display: grid; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.sm-stat-row.is-picked { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
+.sm-stat-step { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.sm-stat-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.sm-stat { display: grid; gap: 1px; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); min-width: 0; }
+.sm-stat strong { font-size: 18px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.sm-stat span { font-size: 11.5px; color: var(--ink-2); }
+.sm-stat.is-good strong { color: var(--green); }
+.sm-stat.is-bad strong { color: var(--danger); }
+.sm-stopped { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 12px; color: var(--ink-2); }
+
+/* ---------------------------------- หน้ายืนยัน ---------------------------------- */
+.sm-sheet-steps { margin: 0; padding: 10px 12px 10px 30px; border-radius: 12px; background: var(--surface-2); display: grid; gap: 4px; font-size: 13px; }
+.sm-basis { color: var(--ink-3); font-size: 12px; }
+
+/* ---------------------------------- จอเล็ก ---------------------------------- */
+@media (max-width: 720px) {
+  .sm-list-head { align-items: stretch; }
+  .sm-new { width: 100%; justify-content: center; }
+  .sm-timeline::before { left: 23px; }
+  .sm-step { padding: 10px 12px; }
+  .sm-hash-input { max-width: none; }
+  .sm-stat-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-modebar.is-on .sm-mode-dot { animation: none; }
+  .sm-seq-card { transition: none; }
+  .sm-seq-card:hover { transform: none; }
+}

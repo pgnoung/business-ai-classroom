@@ -1,0 +1,214 @@
+{
+ "note": "sha256 ของพรอมต์ทุกเส้นที่ตัวตนไปถึงโมเดล — บันทึกจาก production 179fadde0 ก่อนต่อช่อง soul (ขั้นที่ 1 ของแผน soul · บันทึกใหม่ 20 ต.ค. 2026 หลัง merge production)",
+ "baseCommit": "179fadde0c567ec10f27a6ff8a93be6c8ba6d22b",
+ "fixedToday": "2026-10-04",
+ "v3PromptVersion": "v3.9",
+ "text": {
+  "v3.stable.plan_reply": {
+   "sha256": "b252eef8c07ae9b6d0e22baef73a3a06b72ad34507ddcebf601fc278e8ee7de9",
+   "chars": 7212
+  },
+  "v3.stable.reply_only": {
+   "sha256": "da9891b798b0c99a15b88d10e5e79bac40c09693d5a9993155e099e4d3ebd032",
+   "chars": 6952
+  },
+  "legacy.voice_args": {
+   "sha256": "3ab405b24ffd83abb76a0d42d8fa9a5f0ac98f6b5edf766c870b661a1b7a8727",
+   "chars": 16400
+  },
+  "ownerChat.persona": {
+   "sha256": "2d060c96ff726119d5fc5d4419a91ba79112893b1701ddcdfd1e3121367d5dbd",
+   "chars": 4297
+  },
+  "ownerChat.persona_lessons": {
+   "sha256": "8116d754dc10ffa66b74f9d5b37752c437ee4a170964ac8c05bd070d2c123e96",
+   "chars": 5200
+  },
+  "offtopic.system": {
+   "sha256": "25768913d642d51e4e018b74078e93ec04cac4e27df7ce741c9895543716f792",
+   "chars": 4209
+  },
+  "ownerReview.screen_system": {
+   "sha256": "92b8ac8d51d6c32df513b48297a3e7f6618fb44dd6e1e364dd36e9f325b63f2c",
+   "chars": 2660
+  },
+  "ownerReview.daily_system": {
+   "sha256": "533acd2b6debf26f67100b535633be4285f47e2094ae4c129fa5d70373eea403",
+   "chars": 3546
+  },
+  "ownerReview.daily_system_rubric": {
+   "sha256": "3172d38c6fbc01506ab0ccf9b5ea8e2a807c16b2406af1e30329ce190cb1a819",
+   "chars": 3576
+  },
+  "qualify.system": {
+   "sha256": "f39cdd23d3620585d70b3bb489939a21fa70f7fe5d36d8cc3df9554253f29445",
+   "chars": 3933
+  }
+ },
+ "bodies": {
+  "v3.t01-first-price": [
+   "6a02fcef7763fdf645d3b4d67efb178e67740c260c083e5394d7b28e3b19c119",
+   "48183487ad1e5780f207d3db6cf8d4c25495e36092f467a13f788d038f7c0089"
+  ],
+  "legacy_voice_off.t01-first-price": [
+   "54a07d981aec8650f5fbd6d7a587b354f5794787f0175b92685a8942ef6590e5"
+  ],
+  "v3.t02-first-interest": [
+   "afa6f5d41e0c4868120e424ae4fd1e0c7e3c6d20f06522066af2b07bca011292",
+   "d6be8e1c023d5d4e65f45246c802c1a33cf211f367498c9f242e14bb3efbf8d8"
+  ],
+  "legacy_voice_off.t02-first-interest": [
+   "41efc49371e9d79c04fa2248f06976109c92d777a1a160ead6df2cc8377e97df"
+  ],
+  "v3.t03-ladder-answer": [
+   "87c00659eb9eb73f2b635e73a8ccb84a36217e87391ddfec8a5a76d61b9be47c",
+   "fc12f94e158155a6f98cbd04ab4bcb98a925fed80233438655ea2f13d628d271"
+  ],
+  "legacy_voice_off.t03-ladder-answer": [
+   "d2a2c35069419f6cc659db403f5d6f9eb1ff53dd93ce6f3026411750796799f3"
+  ],
+  "v3.t04-tool-answer": [
+   "f0a7d60643cca98009526be8dce99c6a2636a95a51b7ac34524f9dcf67675c74",
+   "2096431f269f6f7a65f26cc62ce5b0efd29a8b2adc74ebbff2184ce2df79b0e5"
+  ],
+  "legacy_voice_off.t04-tool-answer": [
+   "d98945e52d460bc8e38e96c9c622dac8f7710d23e4243c26314dff894d1e7e82"
+  ],
+  "v3.t05-low-confidence": [
+   "7ead1d061c7a40ee7dccc3e7634b7eb56e62a9133926e95baa8b13820a4c33fa",
+   "e2ecc7eef67bdb46cedb92910c5942e4a294c0e1a53469f3add20735cf946ff2"
+  ],
+  "legacy_voice_off.t05-low-confidence": [
+   "84c0488c2eb2a3cb6ed1e42e8a452459ea069720e86eebd2cd2ded23ceb050a5"
+  ],
+  "v3.t06-concept": [
+   "451a9f8c8d9b30939b02bcca04917cc555c561cf52296d57d9eda595479a5a4f",
+   "1a2a2d9a7900030bb7170dd8d3bc031b2baeb3d4956cdde282a9d2d3a1fab9ca"
+  ],
+  "legacy_voice_off.t06-concept": [
+   "22c0af85510073a28765911e80d84221c53465c73cae5296cad4236ff71476e2"
+  ],
+  "v3.t07-goal": [
+   "d47d91c8f1ad34da787abf623881a2453192cee45203d98441e04ca903e9b30a",
+   "4c3315300a63cc214b46febbfab0095f83a47061c49ea33d692c343f75cc7bcf"
+  ],
+  "legacy_voice_off.t07-goal": [
+   "e9bb418da361947f87611b06326191682f336467f04504f83652b34f9fd75ab0"
+  ],
+  "v3.t08-price-after-level": [
+   "25b25cf74aed606c9722fad71aeca2f12a5b37f6bee089441bf9da0f8f2d5087"
+  ],
+  "legacy_voice_off.t08-price-after-level": [
+   "dcc622c678ea76e836a20a601721b6809e648ea7ab22c317b998da9bdd6e8917"
+  ],
+  "v3.t09-pair-discount": [
+   "2531ed1e266d71e74948b81316504830c9fe667ec69e9e1ee377ee1e9eeefe78",
+   "d64f6c1d226ed53ae3aeb67d082dabad136c139c4c622241854ac6afc70a1596"
+  ],
+  "legacy_voice_off.t09-pair-discount": [
+   "599879d10e671c073664fda9fbdd4d1b620dc3b51c60b01c0b2eaecb7391a1a8"
+  ],
+  "v3.t10-single-discount": [
+   "75171bbd0332171863fab783b8cf93508f7b38413f3c2cc49f249c611d2c59b8",
+   "f7c06bea7af599d6aa863b5e882c97e94fa6c7d25251ef37124dc0af69c6f9f6"
+  ],
+  "legacy_voice_off.t10-single-discount": [
+   "93f4dc109b2fb15c69e0275933258255e41a7b9a1abe23efebd76ac655fd7758"
+  ],
+  "v3.t11-objection": [
+   "20254e7f20b2ebc85aca9a1ec55021c493168ddd34bbc1b8f2a95f3c83c7541a",
+   "60df9ac8ab302cc97a9f3e56c34ae50a882e129cfd3e5882a2886b5c4e0f0cc1"
+  ],
+  "legacy_voice_off.t11-objection": [
+   "149fb84c9bcd9403e921f82dfa285f36a1c0297dda6aed0466a3423eb3452c7b"
+  ],
+  "v3.t12-location": [
+   "c80e524ccf1afb089c7bac2bc426191e57cbc2da7b92b35beb8713da95f9b8e8",
+   "b956358c9855863908e0b855187d91f472060e47b2a2dcd804e9e54b562a13c2"
+  ],
+  "legacy_voice_off.t12-location": [
+   "1f2a5e9d4f8957054618d72121a1f64b43a3db72d5ca8608d4f2bf33e0032148"
+  ],
+  "v3.t13-rounds": [
+   "b89070a27a2a6f6da5bc00efb51371998e62678f06c29ad4bfaee3bcfd0a7807",
+   "180bc1b02fa45c86a1f7c96043e1cb7cbae4760b82c45e19944195005973e502"
+  ],
+  "legacy_voice_off.t13-rounds": [
+   "4544424a3afaf4acf58e25f6fa52083725da7964d39dc2b89ab5a371275fc92a"
+  ],
+  "v3.t14-goodbye": [
+   "c154c710d4cd4895fd1e9e343bf57e408b827dafa64518f1ebfe0dab5fe0e8bb"
+  ],
+  "legacy_voice_off.t14-goodbye": [
+   "330a164e637739479e03783f8a104b6783980e7197c4d070dcb5c8c2d98e6b79"
+  ],
+  "v3.t15-misread": [
+   "ea8ac69d06755229794e385fb799af294535da776c75af254c104f9d5cc01662",
+   "1dd6127f60ac60efd76d0dbc8946c9998f7878ae49345180dcc1e371617529a5"
+  ],
+  "legacy_voice_off.t15-misread": [
+   "3ed800f01d07bd13ef5e814dc53ca969d21719e2e3bdc5720924993ed5200aac"
+  ],
+  "v3.t16-checklist": [
+   "bdcb79e1edaf697fc182e08c7fc7dd7fcf163aecc28fc30fedf1fbccf74e6013",
+   "9b10c816d5af78c563b256859e4b6410e53b9f51bb3aef1f3f1dd0a7e8045d37"
+  ],
+  "legacy_voice_off.t16-checklist": [
+   "81019374c45894b49bd8f915c31fe22890d09f51cefd6076d1b127d572c2011b"
+  ],
+  "v3.t17-booking": [
+   "fc40ffb35e5a7531164a695eb82f8df9f599f7bd02d5e75f3c7f2e8dbd0f0b6d"
+  ],
+  "legacy_voice_off.t17-booking": [
+   "77481bd77e7081f70e65ef7bbe0765b55c7bc4dc0cd7d84ef3aa015dc5489317"
+  ],
+  "v3.t18-contact-team": [],
+  "legacy_voice_off.t18-contact-team": [],
+  "v3.t19-in-house": [
+   "28914be7c9c714087c207595f165a956bbd5cdaa8dfd8781235da7b0cdc1ee32"
+  ],
+  "legacy_voice_off.t19-in-house": [
+   "0738c6fb9242a428dba743b59b58dc09d7e791f76b2d7deb042dbb577bfa0fef"
+  ],
+  "v3.t20-payment": [
+   "fc7e0c2d157cc84f0b8dc857c76897ebc0c2b78a92f568857387f9f4729d8b86"
+  ],
+  "legacy_voice_off.t20-payment": [
+   "f864179849c63a999d216ab1fd37ca702a17506dfd1b71453f02c1e13fef646b"
+  ],
+  "v3.t21-online": [
+   "8ccde1b0bd1dea21d969976eda877addb19583cc95311fbfb37142e776973c9a"
+  ],
+  "legacy_voice_off.t21-online": [
+   "cf3324b9f033af2d93c4d992ac640f362aac64cd507fa630ce5d772d8ff062a4"
+  ],
+  "v3.t22-burst": [
+   "7ac021b19aa94cbb6f69b2e3753f1feaa9c7b7a3c45b734aed9f15ad20e50d1c"
+  ],
+  "legacy_voice_off.t22-burst": [
+   "98f7e02d14b9134d043f208055a2d95eaafc3c1cfa2786f8ae9a6a57f05c5fb3"
+  ],
+  "v3.t23-named-classic": [
+   "eb7e951fcb1832949de5b595bd64710192ab8e38f4e3e437e25c7ee3b66099be",
+   "ea4c85a0a253aa395455f3bd8c89f4ddab6dcf402a6e4718aea91aa549afeb99"
+  ],
+  "legacy_voice_off.t23-named-classic": [
+   "889423ca55eed3137878f018b1ec888f7947655ca4bff81b11a01bbbb0142af0"
+  ],
+  "v3.t24-banned-word-redraft": [
+   "b75bc59339ea7e039e40ef84fe568ff9f53dd77c33382512d8193adfb3f67c6d",
+   "aaa1cc04b5dd973ab1800cc160622fe7204513bd0c105e0c51b22c2ed92adad4"
+  ],
+  "legacy_voice_off.t24-banned-word-redraft": [
+   "cfc96b1426957c8e3f2a69ae94f98b35a754ef649ee5125e7d1ea60deedb520c",
+   "ef654a452f80cd90bfcd1b85488bc42aafb2f0787dda31970a1b157b827431fb"
+  ],
+  "v3.t25-admin-promise": [
+   "04616c8dd3181b28de1efe6019914695b1c73470121f5a8add03ab8e917bf952",
+   "d72a05fb1bad43379ac1f273b854b272ea26e5b2f44e5007b30c98904bb6940f"
+  ],
+  "legacy_voice_off.t25-admin-promise": [
+   "5e4c8c61252d044bd3ac7493b56c359a2606b86edfe6098942c489eebb02aba7"
+  ]
+ }
+}

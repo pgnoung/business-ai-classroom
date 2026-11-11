@@ -1,0 +1,11 @@
+#history-audit-panel { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border, #decfd6); }
+.history-audit-controls { display: flex; flex-wrap: wrap; gap: .75rem; margin: .75rem 0; }
+.history-audit-controls select { max-width: 100%; padding: .6rem; border: 1px solid var(--border, #decfd6); border-radius: .6rem; background: var(--surface, #fff); color: var(--text, #342834); }
+.history-audit-rows { display: grid; gap: .75rem; }
+.history-audit-case { padding: 1rem; border: 1px solid var(--border, #decfd6); border-radius: .8rem; background: var(--surface, #fff); }
+.history-audit-diff { border-color: #c79b76; }
+.history-audit-label { color: #8a430c; font-size: .85rem; }
+.history-audit-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: .75rem; }
+.history-audit-comparison p { margin: .4rem 0; }
+.history-audit-summary { font-weight: 600; }
+@media (max-width: 640px) { .history-audit-comparison { grid-template-columns: 1fr; gap: .5rem; } }

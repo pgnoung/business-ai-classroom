@@ -1,0 +1,118 @@
+/* lessons.css — กล่อง "สอนลูกแพร" ในแผงทำไมตอบแบบนี้ + หน้า #/lessons (2026-09-28)
+   ไฟล์แยกตามกติกาคอนโซล: CSP style-src 'self' = ห้าม style="" / el.style ทุกกรณี
+   สีทั้งหมดมาจาก token ของธีม (instance-scope.css) — ช่องพิมพ์ตั้งสีเองชัด ๆ เพราะธีมมืด
+   ไม่งั้นเบราว์เซอร์วาดช่องขาวตัวหนังสือขาวบนมือถือบางรุ่น */
+
+/* ------------------------- กล่องสอนในแผงทำไมตอบแบบนี้ ------------------------- */
+
+.why-lessons-used strong { color: var(--brand-ink); }
+.why-lessons-titles { color: var(--ink-2); }
+
+.why-lesson {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 6px; padding-top: 8px;
+  border-top: 1px dashed var(--line-2);
+}
+.why-lesson-head { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--ink); }
+.why-lesson-topic,
+.why-lesson-input,
+.lesson-edit-topic,
+.lesson-edit-teaching,
+.lesson-edit-scope,
+.lessons-search-input {
+  width: 100%; box-sizing: border-box;
+  font: inherit; font-size: 14px; line-height: 1.5;
+  color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line-2); border-radius: 10px;
+  padding: 8px 10px;
+  color-scheme: inherit;
+}
+.why-lesson-input, .lesson-edit-teaching { resize: vertical; min-height: 72px; }
+.why-lesson-topic::placeholder,
+.why-lesson-input::placeholder,
+.lesson-edit-topic::placeholder,
+.lessons-search-input::placeholder { color: var(--ink-3); opacity: 1; }
+.why-lesson-topic:focus,
+.why-lesson-input:focus,
+.lesson-edit-topic:focus,
+.lesson-edit-teaching:focus,
+.lesson-edit-scope:focus,
+.lessons-search-input:focus {
+  outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100);
+}
+.why-lesson-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.why-lesson-count { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.why-lesson-save { flex-shrink: 0; }
+.why-lesson-status { margin: 0; min-height: 1em; font-size: 12px; overflow-wrap: anywhere; }
+.why-lesson-status:empty { display: none; }
+.why-lesson-status.is-active { color: var(--green); font-weight: 600; }
+.why-lesson-status.is-pending { color: var(--orange); font-weight: 600; }
+.why-lesson-status.is-error { color: var(--danger); }
+.why-lesson-status.is-busy { color: var(--ink-2); }
+.why-lesson-hint { margin: 0; font-size: 11.5px; color: var(--ink-3); }
+.why-lesson-taught { margin: 0; padding-left: 16px; font-size: 12px; color: var(--ink-2); }
+.why-lesson-taught li { overflow-wrap: anywhere; }
+.why-lesson-badge { font-size: 11px; font-weight: 600; white-space: nowrap; }
+.why-lesson-badge.is-active { color: var(--green); }
+.why-lesson-badge.is-pending { color: var(--orange); }
+.why-lesson-badge.is-disabled { color: var(--ink-3); }
+.why-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 4px; }
+.why-lessons-link { font-size: 12px; font-weight: 600; color: var(--brand-ink); text-decoration: none; }
+.why-lessons-link:hover { text-decoration: underline; }
+
+/* ---------------------------------- หน้า #/lessons ---------------------------------- */
+
+.lessons-page { padding: 16px 14px 32px; display: flex; flex-direction: column; gap: 12px; }
+.lessons-intro { display: flex; flex-direction: column; gap: 4px; }
+.lessons-heading { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.lessons-intro p { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+.lessons-intro .lessons-note { font-size: 12.5px; color: var(--ink-3); }
+.lessons-paused-note {
+  margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 13px;
+  background: var(--orange-soft); color: var(--orange); border: 1px solid var(--orange-line);
+}
+.lessons-pause {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border-radius: var(--radius);
+  background: var(--green-soft); border: 1px solid var(--green-line); color: var(--ink);
+}
+.lessons-pause strong { color: var(--green); font-size: 14px; }
+.lessons-pause p { margin: 2px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.lessons-pause.is-paused { background: var(--orange-soft); border-color: var(--orange-line); }
+.lessons-pause.is-paused strong { color: var(--orange); }
+.lessons-pause-toggle { flex-shrink: 0; }
+.lessons-filters { padding: 0; border: none; }
+.lessons-search { display: flex; gap: 8px; align-items: center; }
+.lessons-search .btn { flex-shrink: 0; }
+.lessons-list { display: flex; flex-direction: column; gap: 10px; }
+.lessons-empty { padding: 32px 16px; }
+
+.lesson-card {
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px; box-shadow: var(--shadow-1);
+  border-left: 4px solid var(--green);
+}
+.lesson-card.is-pending { border-left-color: var(--orange); }
+.lesson-card.is-disabled { border-left-color: var(--line-2); }
+.lesson-card.is-disabled .lesson-teaching { color: var(--ink-2); }
+.lesson-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.lesson-title { font-size: 15px; font-weight: 750; overflow-wrap: anywhere; }
+.lesson-card-head .badge { flex-shrink: 0; }
+.lesson-teaching { margin: 0; font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lesson-context { font-size: 12.5px; color: var(--ink-2); }
+.lesson-context summary { cursor: pointer; color: var(--brand-ink); font-weight: 600; }
+.lesson-context p { margin: 6px 0 0; overflow-wrap: anywhere; }
+.lesson-key { color: var(--ink-3); }
+.lesson-room-link { display: inline-block; margin-top: 6px; color: var(--brand-ink); font-weight: 600; text-decoration: none; }
+.lesson-meta { margin: 0; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+.lesson-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.lesson-edit-label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+
+/* มือถือ: ช่องพิมพ์ 16px กัน iOS ซูมหน้าเองตอนแตะ และปุ่มหลักกว้างพอสำหรับนิ้วโป้ง */
+@media (max-width: 520px) {
+  .why-lesson-topic, .why-lesson-input, .lesson-edit-topic, .lesson-edit-teaching,
+  .lesson-edit-scope, .lessons-search-input { font-size: 16px; }
+  .lessons-pause { flex-direction: column; align-items: stretch; }
+  .lesson-actions .btn { flex: 1 1 auto; }
+}

@@ -1,0 +1,145 @@
+/* instance-scope.css — runtime brand theme + Settings Business/Brain/OA scope
+   Kept separate so the shared console stylesheet remains below the 800-line
+   maintenance ceiling and the default Airdog tokens stay in one base file. */
+
+/* Pngoung instance: light work surface by default, dark is operator opt-in. */
+:root.theme-pngoung {
+  color-scheme: light;
+  --bg: #f4f7fc;
+  --surface: #ffffff;
+  --surface-2: #eef3fa;
+  --ink: #142038;
+  --ink-2: #5b6784;
+  --ink-3: #66718a;
+  --muted: #66718a;
+  --line: #e2e8f3;
+  --line-2: #cbd5e5;
+  --brand: #2D8CFF;
+  --brand-600: #1478e8;
+  --brand-700: #0b5fc4;
+  --brand-50: #eaf3ff;
+  --brand-100: #cfe4ff;
+  --brand-ink: #0b5fc4;
+  --on-brand: #ffffff;
+  --grad-brand: linear-gradient(120deg, #2D8CFF, #62B8FF);
+  --green: #14724f; --green-soft: #e5f7ef; --green-line: #bfe3d2;
+  --red: #b42337; --red-soft: #fff0f1; --red-line: #eec3c3;
+  --danger: var(--red); --danger-soft: var(--red-soft); --danger-line: var(--red-line);
+  --orange: #9a5a05; --orange-soft: #fff5df; --orange-line: #ecd9a0;
+  --purple: #6848b8; --purple-soft: #f3efff; --purple-line: #ddd0ff;
+  --hot: #dc5b36; --hot-ink: #a83a1d; --hot-soft: #fff0ea; --hot-track: #f6d7cc;
+  --warm: #d59a14; --warm-ink: #765400; --warm-soft: #fff6dc; --warm-track: #f2e1b0;
+  --qualify: #f5d90a; --qualify-ink: #3d3300; --qualify-soft: #fdf5b0;
+  --cold: #7596bd; --cold-ink: #45617f; --cold-soft: #edf3fa; --cold-track: #d9e4f0;
+  --bubble-ai: #f3f0ff;
+  --opoff-soft: #fff1e6;
+  --opoff-line: #f0ceb1;
+  --neutral-soft: #edf3fa;
+  --neutral-strong: #142038;
+  --chart-inbound: var(--brand);
+  --chart-inbound-fill: color-mix(in srgb, var(--brand) 14%, transparent);
+  --chart-revenue: var(--purple);
+  --chart-revenue-muted: color-mix(in srgb, var(--purple) 22%, transparent);
+  --shadow-1: 0 1px 3px rgba(20, 32, 56, 0.08);
+  --shadow-2: 0 4px 8px rgba(20, 32, 56, 0.12);
+  --shadow-sheet: -8px 0 24px rgba(20, 32, 56, 0.18);
+}
+
+/* Dark option keeps the previous navy visual language. */
+:root.theme-pngoung.theme-dark {
+  color-scheme: dark;
+  --bg: #030815;
+  --surface: #081326;
+  --surface-2: #101f38;
+  --ink: #f5f8ff;
+  --ink-2: #c6d2e5;
+  --ink-3: #aebbd0;
+  --muted: #aebbd0;
+  --line: #263750;
+  --line-2: #40536e;
+  --brand: #2d8cff;
+  --brand-600: #1478e8;
+  --brand-700: #9ad1ff;
+  --brand-50: #102d56;
+  --brand-100: #1c467b;
+  --brand-ink: #9ad1ff;
+  --on-brand: #030815;
+  --green: #65d6a6; --green-soft: #103d35; --green-line: #276953;
+  --red: #ff8c98; --red-soft: #4a1720; --red-line: #71303a;
+  --danger: var(--red); --danger-soft: var(--red-soft); --danger-line: var(--red-line);
+  --orange: #ffc36b; --orange-soft: #4a3212; --orange-line: #6b5121;
+  --purple: #8cbcf2; --purple-soft: #1b3554; --purple-line: #365a86;
+  --hot: #ff8c65; --hot-ink: #ffd1c3; --hot-soft: #4a2119; --hot-track: #663021;
+  --warm: #ffd166; --warm-ink: #ffe6a6; --warm-soft: #4a3a13; --warm-track: #69551b;
+  /* มืด: ป้ายยังเหลืองสดตัวหนังสือเข้ม (ป้ายเหลืองเป็นสัญลักษณ์ที่พี่ง้วงขอ) · พื้นอ่อนเป็นเขียวมะกอกเข้มให้ตัวหนังสือสว่างอ่านได้ */
+  --qualify: #ecdc3c; --qualify-ink: #221d00; --qualify-soft: #3a360e;
+  --cold: #8cbcf2; --cold-ink: #d2e6ff; --cold-soft: #1b3554; --cold-track: #2a4d74;
+  --bubble-ai: #17284b;
+  --opoff-soft: #3c2819;
+  --opoff-line: #68472c;
+  --neutral-soft: #1b2b43;
+  --neutral-strong: #f5f8ff;
+  --chart-inbound: #62b8ff;
+  --chart-inbound-fill: color-mix(in srgb, var(--chart-inbound) 24%, transparent);
+  --chart-revenue: #d8b4fe;
+  --chart-revenue-muted: color-mix(in srgb, var(--chart-revenue) 28%, transparent);
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.32);
+  --shadow-2: 0 5px 8px rgba(0, 0, 0, 0.38);
+  --shadow-sheet: -8px 0 32px rgba(0, 0, 0, 0.52);
+}
+
+/* Midnight Navy on bright brand controls is 6.01:1. */
+:root.theme-pngoung .brand-mark,
+:root.theme-pngoung .login-mark,
+:root.theme-pngoung .btn-primary { color: var(--on-brand); }
+:root.theme-pngoung.theme-dark .tabbar { box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.38); }
+:root.theme-pngoung.theme-dark .btn-danger,
+:root.theme-pngoung.theme-dark .stat-card.is-urgent { border-color: var(--danger-line); }
+:root.theme-pngoung.theme-dark .toast { background: var(--surface-2); color: var(--ink); }
+:root.theme-pngoung.theme-dark .login-body {
+  background-image:
+    radial-gradient(460px 320px at 10% -6%, rgba(45, 140, 255, 0.28), transparent 72%),
+    radial-gradient(420px 320px at 98% 30%, rgba(98, 184, 255, 0.20), transparent 72%);
+}
+
+/* LuKprae AI theme lives in theme-lukprae.css + theme-lukprae-pages.css
+   (28 ก.ย. 2026: ยกระดับเป็นธีม "พี่สาวคนโต" มีโหมดมืด ฟอนต์ และภาพตัวละคร — แยกไฟล์
+   เพื่อให้ไฟล์นี้เหลือแค่ token ของ Pngoung และกรอบ Settings เหมือนเดิม) */
+
+:root.theme-pngoung .topbar {
+  background: linear-gradient(105deg, #030815, #081326);
+  border-color: #172844;
+  color: #f5f8ff;
+}
+:root.theme-pngoung .topbar .brand,
+:root.theme-pngoung .topbar .topnav-link,
+:root.theme-pngoung .topbar .me,
+:root.theme-pngoung .topbar .btn-logout { color: #c6d2e5; }
+:root.theme-pngoung .topbar .topnav-link:hover,
+:root.theme-pngoung .topbar .topnav-link.is-active,
+:root.theme-pngoung .topbar .theme-toggle:hover { background: #17345d; color: #fff; }
+:root.theme-pngoung .theme-toggle { color: #c6d2e5; }
+
+/* Settings context is a three-level safety rail: Business -> Brain -> LINE OA.
+   OA rows remain mounted and are only hidden, preserving another OA's draft. */
+.settings-context { border-color: var(--brand-100); }
+.settings-context-list { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.settings-context-row {
+  display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 10px; align-items: center;
+  padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
+}
+.settings-context-row dt { color: var(--ink-2); font-size: 12px; font-weight: 700; }
+.settings-context-row dd { margin: 0; min-width: 0; font-size: 14px; font-weight: 700; word-break: break-word; }
+.settings-context-value { color: var(--brand-700); }
+.settings-oa-select { width: 100%; min-width: 0; }
+.settings-shared-scope, .settings-oa-scope {
+  margin: 8px 0 0; padding: 6px 9px; border-radius: 8px;
+  font-size: 12px; font-weight: 700; line-height: 1.45;
+}
+.settings-shared-scope { color: var(--purple); background: var(--purple-soft); }
+.settings-oa-scope { color: var(--brand-700); background: var(--brand-50); }
+.settings-oa-row.is-oa-hidden { display: none; }
+
+@media (max-width: 520px) {
+  .settings-oa-select { font-size: 14px; padding-inline: 10px 30px; }
+}

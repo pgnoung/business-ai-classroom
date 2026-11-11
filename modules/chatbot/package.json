@@ -1,0 +1,15 @@
+{
+  "name": "ai-front-line-chassis",
+  "version": "1.8.0-dev.0",
+  "private": true,
+  "type": "module",
+  "description": "AI Front Line Chassis — LINE OA front desk on Hermes, Node 22 zero-dep (v1.0.0 pilot release; version history in docs/VERSION.md)",
+  "engines": {
+    "node": ">=22.16"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs",
+    "test": "node --test"
+  }
+}

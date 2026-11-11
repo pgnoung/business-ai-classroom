@@ -1,0 +1,14 @@
+[
+  {
+    "key": "menu-overview",
+    "url": "https://example.com/images/menu-overview.jpg",
+    "description": "ภาพเมนูบริการรวมของคลินิก"
+  },
+  {
+    "key": "map-main-branch",
+    "url": "https://example.com/images/map-main.png",
+    "preview_url": "https://example.com/images/map-main-preview.png",
+    "description": "แผนที่สาขาหลัก",
+    "needs_verification": false
+  }
+]

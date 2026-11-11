@@ -1,0 +1,201 @@
+/* identityLinks.css — แผง "ช่องทางอื่นของลูกค้าคนนี้" (28 ก.ย. 2026 · identityLinks.mjs)
+   ใช้โทเคนของธีมเดิมทั้งหมด (สว่าง/มืด ตามธีมที่เปิดอยู่) — สีเพิ่มเองมีชุดเดียวคือฟ้าของป้าย Facebook
+   ความหมายของสี: เขียว = LINE / หลักฐานแน่น (เบอร์·อีเมลตรง) · ฟ้า = Facebook · อำพัน = คำใบ้อ่อน/เหตุที่กดไม่ได้
+   ตัวหนังสือทุกคู่สีผ่าน 4.5:1 (ฟ้า #1d5bbf บน #eaf1fd ≈ 5.6:1 · มืด #a9c8ff บน #182842 ≈ 8.7:1) */
+
+:root {
+  --idl-fb: #1d5bbf;
+  --idl-fb-soft: #eaf1fd;
+  --idl-fb-line: #c5d7f6;
+}
+:root.theme-dark {
+  --idl-fb: #a9c8ff;
+  --idl-fb-soft: #182842;
+  --idl-fb-line: #2c4470;
+}
+
+.idl-panel { padding-top: 12px; }
+.idl-title {
+  display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 14px 10px;
+  font-size: 14px; font-weight: 700; color: var(--ink);
+}
+.idl-count {
+  font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 1px 9px;
+  background: var(--purple-soft); color: var(--purple);
+}
+
+.idl-list { list-style: none; margin: 0; padding: 0 14px 10px; display: flex; flex-direction: column; gap: 8px; }
+.idl-item {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px 10px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm, 10px);
+  background: var(--surface-2); overflow: hidden;
+}
+/* แถบสีบาง ๆ ด้านซ้ายบอกช่องทางก่อนอ่านป้าย */
+.idl-item::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--green);
+}
+.idl-item:has(.idl-badge-fb)::before { background: var(--idl-fb); }
+.idl-item-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.idl-name {
+  flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.idl-open {
+  flex-shrink: 0; font-size: 12.5px; font-weight: 600; color: var(--brand-ink);
+  text-decoration: none; padding: 4px 2px; border-radius: 6px;
+}
+.idl-open:hover { text-decoration: underline; text-underline-offset: 3px; }
+.idl-open:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.idl-badge {
+  flex-shrink: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.01em;
+  border-radius: 999px; padding: 2px 8px; line-height: 1.5;
+}
+.idl-badge-line { background: var(--green-soft); color: var(--green); box-shadow: inset 0 0 0 1px var(--green-line, transparent); }
+.idl-badge-fb { background: var(--idl-fb-soft); color: var(--idl-fb); box-shadow: inset 0 0 0 1px var(--idl-fb-line); }
+
+.idl-meta { margin: 0; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+.idl-meta-inline { font-size: 11.5px; color: var(--ink-3); }
+.idl-hint { margin: 0; padding: 0 14px 10px; font-size: 12px; color: var(--ink-2); line-height: 1.55; }
+.idl-hint.is-blocked { color: var(--warm-ink); font-weight: 600; }
+
+.idl-unlink, .idl-link { align-self: flex-start; }
+.idl-unlink:hover { border-color: var(--danger); color: var(--danger); }
+
+.idl-invite-block { display: flex; flex-direction: column; }
+.idl-invite-block .panel-row { padding-bottom: 8px; }
+.idl-invite-block > .idl-meta { padding: 0 14px 10px; }
+.idl-invite { transition: transform 0.12s var(--ease-out, ease), opacity 0.12s var(--ease-out, ease); }
+.idl-invite:not(:disabled):active { transform: translateY(1px); }
+
+/* รายการแนะนำ — พับไว้ก่อน เปิดแล้วค่อยโหลด (ไม่คิวรีทุกครั้งที่เปิดห้อง) */
+.idl-suggest-box {
+  margin: 2px 14px 14px; border: 1px dashed var(--line-2); border-radius: 12px; background: var(--surface);
+}
+.idl-suggest-box > summary {
+  display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 12px;
+  font-size: 13px; font-weight: 600; color: var(--purple); cursor: pointer; list-style: none;
+  border-radius: 12px; transition: background-color 0.12s var(--ease-out, ease);
+}
+.idl-suggest-box > summary::-webkit-details-marker { display: none; }
+.idl-suggest-box > summary::before {
+  content: "›"; width: 12px; font-size: 15px; color: var(--ink-3);
+  transition: transform 0.15s var(--ease-out, ease);
+}
+.idl-suggest-box[open] > summary::before { transform: rotate(90deg); }
+.idl-suggest-box > summary:hover { background: var(--surface-2); }
+.idl-suggest-box > summary:focus-visible { outline: none; box-shadow: var(--ring); }
+.idl-suggest-box .idl-hint,
+.idl-suggest-box .panel-row,
+.idl-suggest-box .idl-list { padding-left: 12px; padding-right: 12px; }
+.idl-search { flex: 1; min-width: 0; }
+.idl-empty { font-size: 12.5px; color: var(--ink-2); padding: 2px 0 4px; }
+
+.idl-suggest.is-strong { border-color: var(--green-line, var(--line)); }
+.idl-reasons { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.idl-reason {
+  font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
+  background: var(--neutral-soft); color: var(--ink-2);
+}
+.idl-reason-phone, .idl-reason-email { background: var(--green-soft); color: var(--green); }
+.idl-reason-name { background: var(--warm-soft); color: var(--warm-ink); }
+/* 30 ก.ย. 2026: คำใบ้จากจังหวะเวลา (ลิงก์เชิญ ↔ แอดไลน์) — น้ำเงิน แยกจากหลักฐานจริงสีเขียว */
+.idl-reason-invite, .idl-reason-new_friend { background: var(--cold-soft); color: var(--brand-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .idl-invite, .idl-suggest-box > summary, .idl-suggest-box > summary::before { transition: none; }
+}
+
+/* ───────── ปุ่มเลือกคลาสที่ลูกค้าซื้อ (ห้อง Facebook · 28 ก.ย. ค่ำ ตามคำตอบพี่ง้วง) ─────────
+   เลือกแล้ว = เขียว (ปลายทางคือ LINE) · ต้องเลือกก่อนส่งเสมอ · ใช้ radiogroup ของปุ่มจริง (กดด้วยคีย์บอร์ด/ลูกศรได้) */
+.idl-classes-title { margin: 2px 0 0; padding: 0 14px 6px; font-size: 12.5px; font-weight: 700; color: var(--ink); }
+.idl-classes { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 8px; }
+.idl-class {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  width: 100%; min-height: 44px; padding: 8px 12px 8px 36px; text-align: left; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink);
+  font: inherit; transition: border-color 0.12s var(--ease-out, ease), background-color 0.12s var(--ease-out, ease);
+}
+/* จุดเลือกแบบวิทยุ — วงนอกเสมอ วงในเฉพาะที่เลือก */
+.idl-class::before {
+  content: ""; position: absolute; left: 12px; top: 50%; width: 14px; height: 14px; margin-top: -7px;
+  border-radius: 50%; border: 1.5px solid var(--line-2); background: var(--surface);
+}
+.idl-class[aria-checked="true"] { border-color: var(--green); background: var(--green-soft); }
+.idl-class[aria-checked="true"]::before { border-color: var(--green); box-shadow: inset 0 0 0 3px var(--surface); background: var(--green); }
+.idl-class:not(:disabled):hover { border-color: var(--line-2); }
+.idl-class[aria-checked="true"]:not(:disabled):hover { border-color: var(--green); }
+.idl-class:focus-visible { outline: none; box-shadow: var(--ring); }
+.idl-class:disabled { cursor: not-allowed; opacity: 0.55; }
+.idl-class-label { font-size: 13.5px; font-weight: 700; line-height: 1.35; }
+.idl-class-hint { font-size: 11.5px; color: var(--ink-2); line-height: 1.4; }
+.idl-suggest-note { padding-bottom: 6px; }
+.idl-warn { color: var(--warm-ink); font-weight: 600; }
+
+.idl-preview { margin: 0 14px 8px; border-radius: 10px; background: var(--surface-2); }
+.idl-preview > summary {
+  min-height: 36px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; color: var(--brand-ink);
+  cursor: pointer; border-radius: 10px;
+}
+.idl-preview > summary:focus-visible { outline: none; box-shadow: var(--ring); }
+.idl-preview-text {
+  margin: 0 12px 6px; padding: 10px 12px; max-height: 320px; overflow: auto;
+  white-space: pre-wrap; word-break: break-word; font: inherit; font-size: 12.5px; line-height: 1.6;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+}
+.idl-preview > .idl-meta { padding: 0 12px 10px; }
+
+.idl-class-badge {
+  align-self: flex-start; margin: 0; font-size: 11.5px; font-weight: 700; border-radius: 999px;
+  padding: 2px 9px; background: var(--purple-soft); color: var(--purple);
+}
+.idl-purchased { margin: 0; padding: 0 14px 10px; font-size: 12.5px; color: var(--ink-2); }
+.idl-purchased strong { color: var(--ink); }
+
+/* ───────── หน้าตั้งค่า: ข้อความหลังเชื่อม LINE แยกตามคลาส (settingsIdentityLink.mjs) ─────────
+   ซ้าย = ข้อความ (แก้ได้เฉพาะเจ้าของ) · ขวา = จอแชท LINE จำลอง (บับเบิลจริงที่ลูกค้าจะเห็น) */
+:root { --idl-chat-bg: #dfe7f1; --idl-chat-bubble: #ffffff; --idl-chat-ink: #1f2430; }
+:root.theme-dark { --idl-chat-bg: #1b2331; --idl-chat-bubble: #2a3346; --idl-chat-ink: #eef1f7; }
+
+.idl-tpl-list { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+.idl-tpl {
+  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+}
+.idl-tpl-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.idl-tpl-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); }
+.idl-tpl-status { font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 2px 9px; }
+.idl-tpl-status.is-default { background: var(--purple-soft); color: var(--purple); }
+.idl-tpl-status.is-custom { background: var(--green-soft); color: var(--green); }
+.idl-tpl-status.is-empty { background: var(--warm-soft); color: var(--warm-ink); }
+.idl-tpl-hint { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.idl-tpl-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 900px) {
+  .idl-tpl-body { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); align-items: start; }
+}
+.idl-tpl-editor { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.idl-tpl-input { width: 100%; min-height: 220px; resize: vertical; font-size: 13.5px; line-height: 1.6; }
+.idl-tpl-readonly {
+  margin: 0; padding: 10px 12px; max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+  font: inherit; font-size: 13px; line-height: 1.6; color: var(--ink); background: var(--surface-2); border-radius: 10px;
+}
+.idl-tpl-count { margin: 0; font-size: 12px; color: var(--ink-2); }
+.idl-tpl-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.idl-tpl-preview { min-width: 0; }
+.idl-tpl-phone {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  padding: 14px 12px; min-height: 120px; overflow: auto;
+  border-radius: 14px; background: var(--idl-chat-bg);
+}
+/* จอกว้าง: ตัวอย่างอยู่ข้างช่องแก้ — จำกัดความสูงให้เท่าช่วงสายตา (มือถือเรียงลงล่าง ไม่ต้องจำกัด) */
+@media (min-width: 900px) { .idl-tpl-phone { max-height: 760px; } }
+.idl-tpl-bubble {
+  margin: 0; max-width: 92%; padding: 9px 12px; border-radius: 4px 16px 16px 16px;
+  background: var(--idl-chat-bubble); color: var(--idl-chat-ink); box-shadow: 0 1px 1.5px rgba(15, 23, 42, 0.08);
+  white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.55;
+}
+.idl-tpl-error { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  .idl-class { transition: none; }
+}

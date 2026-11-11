@@ -1,0 +1,5 @@
+[
+  { "id": "house-blend", "name": "เมล็ดกาแฟเฮาส์เบลนด์", "price": 290, "unit": "ถุง 250 กรัม", "category": "เมล็ดกาแฟ", "description": "คั่วกลาง หอมช็อกโกแลต", "aliases": ["เฮาส์เบลนด์", "house blend"], "image": "images/house-blend.png", "active": true },
+  { "id": "drip-bag", "name": "กาแฟดริปซอง", "price": 150, "unit": "กล่อง 10 ซอง", "category": "ดริป", "description": "ชงง่ายแค่เทน้ำร้อน", "aliases": ["ดริปซอง"], "image": "images/drip-bag.jpg" },
+  { "id": "cold-brew", "name": "โคลด์บรูว์ขวด", "price": 89, "unit": "ขวด", "description": "สกัดเย็น 18 ชั่วโมง" }
+]

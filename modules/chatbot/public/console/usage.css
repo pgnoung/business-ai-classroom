@@ -1,0 +1,251 @@
+/* usage.css — หน้า "Usage วันนี้" ของเจ้าของ (#/usage · 8 พ.ย. 2026)
+   ทิศทาง: หอดูดาวกลางคืน — แผงหัวสีพลัมกลางคืน (ธีมลูกแพร) / กรมท่า (ธีมตั้งต้น) มีแสงเรืองลอยช้า ๆ
+   ตัวเลขใหญ่ไล่สีโรสโกลด์ การ์ดด้านล่างคือพื้นผิวสว่างของคอนโซลเดิม
+   motion ใช้ transform/opacity เป็นหลัก (วงแหวนคุณภาพใช้ stroke-dashoffset ชิ้นเดียว) · ลดการเคลื่อนไหว = นิ่งทั้งหน้า
+   สีทั้งหมดมาจาก token ของธีม (ไม่มีสีประจำแบรนด์ลูกแพรแบบตัวอักษรในไฟล์นี้) */
+.uz {
+  --uz-night: var(--lk-night, var(--neutral-strong));
+  --uz-night-2: var(--lk-night-2, var(--brand-700));
+  --uz-plum: var(--lk-plum, var(--purple));
+  --uz-gold: var(--lk-gold, var(--warm));
+  --uz-gold-soft: var(--lk-gold-soft, var(--warm-soft));
+  --uz-glow-a: color-mix(in srgb, var(--brand) 55%, transparent);
+  --uz-glow-b: color-mix(in srgb, var(--uz-plum) 60%, transparent);
+  --uz-on-night: rgba(255, 255, 255, 0.96);
+  --uz-on-night-2: rgba(255, 255, 255, 0.74);
+  display: grid;
+  gap: 18px;
+  padding-bottom: 32px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------- ท่าเปิดหน้า ----------------------------- */
+.uz-rise { animation: uz-rise 640ms var(--ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.uz.is-settled .uz-rise,
+.uz.is-settled .uz-bar,
+.uz.is-settled .uz-job-fill,
+.uz.is-settled .uz-ring-arc,
+.uz.is-settled .uz-role,
+.uz.is-settled .uz-ghost { animation: none; }
+@keyframes uz-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* --------------------------------- hero --------------------------------- */
+.uz-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 22px;
+  background: linear-gradient(140deg, var(--uz-night) 0%, var(--uz-night-2) 100%);
+  color: var(--uz-on-night);
+  box-shadow: 0 18px 40px -22px color-mix(in srgb, var(--uz-night) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--uz-gold) 35%, transparent);
+}
+.uz-aurora { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.uz-blob {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0.7;
+  will-change: transform;
+}
+.uz-blob.is-a { top: -30%; right: -8%; background: radial-gradient(circle, var(--uz-glow-a), transparent 68%); animation: uz-drift-a 18s ease-in-out infinite alternate; }
+.uz-blob.is-b { bottom: -40%; left: -10%; background: radial-gradient(circle, var(--uz-glow-b), transparent 68%); animation: uz-drift-b 23s ease-in-out infinite alternate; }
+@keyframes uz-drift-a { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-18%, 22%, 0) scale(1.15); } }
+@keyframes uz-drift-b { from { transform: translate3d(0, 0, 0) scale(1.1); } to { transform: translate3d(24%, -16%, 0) scale(0.95); } }
+.uz-hero-inner { position: relative; padding: clamp(20px, 4vw, 36px); display: grid; gap: 6px; }
+.uz-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; margin: 0;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--uz-on-night-2);
+}
+.uz-live { position: relative; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
+.uz-live::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--brand);
+  animation: uz-ping 1.8s var(--ease) infinite;
+}
+@keyframes uz-ping { from { transform: scale(1); opacity: 0.7; } to { transform: scale(3.2); opacity: 0; } }
+.uz-hero-title { margin: 6px 0 0; font-size: clamp(1.05rem, 2vw, 1.25rem); font-weight: 600; color: var(--uz-on-night-2); }
+.uz-hero-cost { margin: 0; line-height: 1.05; }
+.uz-num.is-hero {
+  display: inline-block;
+  font-size: clamp(2.8rem, 7vw, 4.6rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  background: linear-gradient(100deg, var(--uz-on-night) 20%, var(--uz-gold-soft) 60%, var(--uz-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.uz-hero-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 2px 0 10px; color: var(--uz-on-night-2); font-size: 14px; }
+.uz-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; background: rgba(255, 255, 255, 0.10); color: var(--uz-on-night);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.uz-chip.is-down { background: color-mix(in srgb, var(--green) 32%, transparent); }
+.uz-chip.is-up { background: color-mix(in srgb, var(--brand) 38%, transparent); }
+.uz-hero-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 8px 0 0; }
+.uz-hero-stat {
+  padding: 12px 14px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(6px);
+  transition: transform 220ms var(--ease), background 220ms var(--ease);
+}
+.uz-hero-stat:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.10); }
+.uz-hero-stat dt { font-size: 12px; color: var(--uz-on-night-2); }
+.uz-hero-stat dd { margin: 2px 0; font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 600; color: var(--uz-on-night); }
+.uz-hero-stat small { font-size: 11.5px; color: var(--uz-on-night-2); }
+
+/* -------------------------------- การ์ด -------------------------------- */
+.uz-grid { display: grid; gap: 18px; align-items: start; }
+@media (min-width: 960px) { .uz-grid { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); } }
+@media (min-width: 1100px) { .uz-grid.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.uz-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px 18px 16px;
+  box-shadow: var(--shadow-1); min-width: 0; display: grid; gap: 12px; align-content: start;
+}
+.uz-card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.uz-card-head h2 { margin: 0; font-size: 16px; font-weight: 600; color: var(--ink); }
+.uz-card-note { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.uz-empty { margin: 0; color: var(--ink-2); font-size: 14px; }
+.uz-warn { margin: 0; font-size: 12.5px; color: var(--red); }
+
+/* --------------------------- จังหวะรายชั่วโมง --------------------------- */
+.uz-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--ink-2); }
+.uz-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.uz-swatch { width: 10px; height: 10px; border-radius: 3px; }
+.uz-swatch.is-in { background: var(--uz-plum); }
+.uz-swatch.is-reply { background: var(--brand); }
+.uz-swatch.is-fu { background: var(--uz-gold); }
+.uz-swatch.is-ghost { background: transparent; border-top: 2px dashed var(--ink-3); border-radius: 0; height: 0; width: 14px; }
+.uz-pulse-frame { margin: 0 -4px; }
+.uz-pulse-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.uz-gridline { stroke: var(--line); stroke-width: 1; }
+.uz-tick { fill: var(--ink-3); font-size: 11px; }
+.uz-now-col { fill: color-mix(in srgb, var(--brand) 9%, transparent); animation: uz-breathe 2.6s ease-in-out infinite; }
+@keyframes uz-breathe { 50% { opacity: 0.45; } }
+.uz-ghost { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 4 5; opacity: 0.7; animation: uz-fade 900ms 500ms var(--ease) both; }
+@keyframes uz-fade { from { opacity: 0; } }
+.uz-bar {
+  transform-box: fill-box; transform-origin: 50% 100%;
+  animation: uz-grow 760ms var(--ease) both; animation-delay: var(--d, 0ms);
+  transition: opacity 160ms ease;
+}
+@keyframes uz-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.uz-bar.is-in { fill: var(--uz-plum); }
+.uz-bar.is-reply { fill: var(--brand); }
+.uz-bar.is-fu { fill: var(--uz-gold); }
+.uz-hour.is-future .uz-bar { opacity: 0.2; }
+.uz-hit { fill: transparent; cursor: pointer; }
+.uz-pulse-svg:hover .uz-hour:not(:hover) .uz-bar { opacity: 0.38; }
+.uz-hour:focus { outline: none; }
+.uz-hour:focus-visible .uz-hit { stroke: var(--brand); stroke-width: 2; rx: 8; }
+.uz-pulse-detail { margin: 0; min-height: 1.4em; font-size: 13px; color: var(--ink-2); }
+
+/* ------------------------------ ค่า AI ตามงาน ------------------------------ */
+.uz-job-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.uz-job { display: grid; gap: 5px; }
+.uz-job-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 14px; color: var(--ink); }
+.uz-job-top strong { font-weight: 600; }
+.uz-job-cost { margin-left: auto; font-weight: 600; }
+.uz-job small { font-size: 12px; color: var(--ink-2); }
+.uz-model {
+  font-size: 11.5px; padding: 2px 8px; border-radius: 999px;
+  background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line);
+}
+.uz-job-track { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.uz-job-fill {
+  display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--grad-brand);
+  transform: scaleX(var(--w, 0)); transform-origin: 0 50%;
+  animation: uz-fill 900ms var(--ease) both; animation-delay: var(--d, 0ms);
+}
+@keyframes uz-fill { from { transform: scaleX(0); } }
+
+/* ------------------------------- ใครทำงานอะไร ------------------------------- */
+.uz-role-grid { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr)); }
+.uz-role {
+  --uz-accent: var(--ink-3);
+  position: relative; display: grid; gap: 3px; padding: 14px 14px 12px 16px; border-radius: 14px;
+  background: var(--surface-2); border: 1px solid var(--line); overflow: hidden;
+  animation: uz-rise 560ms var(--ease) both; animation-delay: calc(200ms + var(--i, 0) * 60ms);
+  transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+.uz-role::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--uz-accent); }
+.uz-role:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.uz-role.is-sol { --uz-accent: var(--brand); }
+.uz-role.is-luna { --uz-accent: var(--uz-plum); }
+.uz-role.is-claude { --uz-accent: var(--uz-gold); }
+.uz-role-job { font-size: 12.5px; color: var(--ink-2); }
+.uz-role-model { font-size: 15px; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.uz-role-how, .uz-role-today { font-size: 12px; color: var(--ink-2); }
+.uz-role-today { color: var(--ink); font-weight: 600; }
+
+/* ------------------------------- คุณภาพคำตอบ ------------------------------- */
+.uz-quality-body { display: grid; grid-template-columns: 124px minmax(0, 1fr); align-items: center; gap: 18px; }
+.uz-ring-wrap { position: relative; width: 124px; height: 124px; flex: none; }
+.uz-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.uz-ring-track { fill: none; stroke: var(--surface-2); stroke-width: 10; }
+.uz-ring-arc { fill: none; stroke: var(--brand); stroke-width: 10; stroke-linecap: round; animation: uz-ring 1.1s 250ms var(--ease) both; }
+@keyframes uz-ring { from { stroke-dashoffset: var(--c); } }
+.uz-ring-label { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.uz-ring-label .uz-num { font-size: 26px; font-weight: 600; color: var(--ink); }
+.uz-ring-label small { font-size: 11.5px; color: var(--ink-2); }
+.uz-qualify-facts { margin: 0; display: grid; gap: 6px 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: 13px; }
+.uz-qualify-facts div { display: grid; }
+.uz-quality-facts { margin: 0; display: grid; gap: 7px; font-size: 13px; }
+.uz-quality-facts div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 1px dashed var(--line); padding-bottom: 5px; }
+.uz-quality-facts div:last-child { border-bottom: 0; padding-bottom: 0; }
+.uz-quality-facts dt, .uz-qualify-facts dt { color: var(--ink-2); font-size: 12px; }
+.uz-quality-facts dd, .uz-qualify-facts dd { margin: 0; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.uz-rules { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+.uz-rule { padding: 2px 8px; border-radius: 999px; background: var(--brand-50); color: var(--brand-ink); border: 1px solid var(--brand-100); }
+
+/* -------------------------------- คัดกรอง -------------------------------- */
+.uz-mode { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); }
+.uz-qualify.is-on .uz-mode { background: var(--qualify-soft); color: var(--qualify-ink); }
+.uz-qualify-hero { display: flex; align-items: center; gap: 14px; }
+.uz-qualify-hero small { display: block; font-size: 12px; color: var(--ink-2); }
+.uz-num.is-big { font-size: 34px; font-weight: 600; color: var(--ink); line-height: 1.1; }
+.uz-qualify-dot {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--qualify); flex: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--qualify) 30%, transparent);
+}
+.uz-qualify.is-on .uz-qualify-dot { animation: uz-halo 2.4s ease-in-out infinite; }
+@keyframes uz-halo { 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--qualify) 10%, transparent); } }
+.uz-meter { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.uz-meter-fill { display: block; height: 100%; width: 100%; background: var(--qualify); transform: scaleX(var(--w, 0)); transform-origin: 0 50%; animation: uz-fill 900ms 300ms var(--ease) both; }
+
+/* -------------------------------- กุญแจ API -------------------------------- */
+.uz-key-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.uz-key {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13px;
+}
+.uz-key strong { font-weight: 600; color: var(--ink); }
+.uz-key span:last-child { color: var(--ink-2); font-size: 12px; }
+.uz-key-led { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink-3); }
+.uz-key.is-active { border-color: var(--green-line); background: var(--green-soft); }
+.uz-key.is-active span:last-child { color: var(--green); font-weight: 600; }
+.uz-key.is-active .uz-key-led { border-color: var(--green); background: var(--green); animation: uz-led 2s ease-in-out infinite; }
+@keyframes uz-led { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--green) 18%, transparent); } }
+
+/* -------------------------------- หมายเหตุ -------------------------------- */
+.uz-notes { font-size: 12.5px; color: var(--ink-2); }
+.uz-notes summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.uz-notes ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+
+/* -------------------------------- มือถือ -------------------------------- */
+@media (max-width: 720px) {
+  .uz-hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .uz-hero { border-radius: 18px; }
+  .uz-card { padding: 16px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uz, .uz *, .uz *::before, .uz *::after { animation: none !important; transition: none !important; }
+}
+
+/* ลิงก์เข้าหน้านี้จากการ์ดค่า AI หน้าภาพรวม (overviewTeam.mjs) */
+.usage-link { color: var(--brand-ink); font-weight: 600; text-decoration: none; }
+.usage-link:hover, .usage-link:focus-visible { text-decoration: underline; }

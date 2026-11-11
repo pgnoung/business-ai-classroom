@@ -1,0 +1,441 @@
+/* ownerReview.css — "ห้องตรวจ" (#/owner-review) · ทีละห้องเป็นกองการ์ดบน iPhone
+   ทิศทาง: กองการ์ดที่มีน้ำหนัก (ใบถัดไปโผล่ขอบใต้ใบบน) + สีหมวดที่สื่อความหมาย + ปุ่มใหญ่ระยะนิ้วโป้ง
+   ใช้ token ของธีม (console.css / theme-*.css) เท่านั้น สว่าง/มืดตามธีมเอง · โมชันเฉพาะ transform/opacity
+   prefers-reduced-motion: console.css ปิด transition/animation ทั้งหมดอยู่แล้ว (JS ก็ไม่รอโมชัน) */
+
+.orv {
+  --orv-gutter: 16px;
+  --orv-radius: calc(var(--radius-lg, 20px) + 4px);
+  --orv-dur: 220ms;
+  --orv-act-h: 56px;
+  /* จุดสีช่องทาง (สีแบรนด์ของแพลตฟอร์ม ใช้เป็นจุดเล็กเท่านั้น ไม่ใช่พื้นตัวหนังสือ) */
+  --orv-line-green: #06c755;
+  --orv-fb-blue: #1877f2;
+  flex: 1 0 auto; width: 100%; max-width: 560px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 12px var(--orv-gutter) 0;
+}
+.orv-scroll { display: flex; flex-direction: column; }
+.orv > * { min-width: 0; }
+/* [hidden] ต้องชนะ display ของคลาสในหน้านี้เสมอ */
+.orv [hidden], .orv-sheet-layer [hidden], .orv-undo [hidden] { display: none !important; }
+
+/* ข้อความแจ้งเตือนทั่วไปของคอนโซลย้ายไปขอบบน — ขอบล่างของหน้านี้เป็นของปุ่มตัดสินและแถบย้อน */
+body:has(.orv-scroll) .toast { top: calc(env(safe-area-inset-top) + 64px); bottom: auto; }
+
+/* --------------------------------- สีหมวด --------------------------------- */
+
+.tone-money { --orv-accent: var(--warm); --orv-chip-bg: var(--warm-soft); --orv-chip-ink: var(--warm-ink); }
+.tone-monk { --orv-accent: var(--purple); --orv-chip-bg: var(--purple-soft); --orv-chip-ink: var(--purple); }
+.tone-sell { --orv-accent: var(--cold); --orv-chip-bg: var(--cold-soft); --orv-chip-ink: var(--cold-ink); }
+.tone-gamble { --orv-accent: var(--orange); --orv-chip-bg: var(--orange-soft); --orv-chip-ink: var(--orange); }
+.tone-harass { --orv-accent: var(--red); --orv-chip-bg: var(--red-soft); --orv-chip-ink: var(--red); }
+.tone-personal { --orv-accent: var(--brand); --orv-chip-bg: var(--brand-50); --orv-chip-ink: var(--brand-ink); }
+
+.next-tone-money { --orv-next: var(--warm); }
+.next-tone-monk { --orv-next: var(--purple); }
+.next-tone-sell { --orv-next: var(--cold); }
+.next-tone-gamble { --orv-next: var(--orange); }
+.next-tone-harass { --orv-next: var(--red); }
+.next-tone-personal { --orv-next: var(--brand); }
+
+/* ------------------------------ สวิตช์สองแท็บ ------------------------------ */
+
+.orv-seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 16px;
+}
+.orv-seg-btn {
+  min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 6px 10px; border-radius: 12px; text-decoration: none; text-align: center;
+  color: var(--ink-2); font-weight: 600; font-size: 14.5px; line-height: 1.3;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.orv-seg-btn:hover { color: var(--ink); }
+.orv-seg-btn.is-active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1), 0 0 0 1px var(--line); }
+.orv-seg-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.orv-seg-count {
+  min-width: 24px; height: 22px; padding: 0 7px; border-radius: 999px; display: inline-grid; place-items: center;
+  font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: var(--brand-100); color: var(--brand-ink);
+}
+.orv-seg-count.is-zero { background: var(--line); color: var(--ink-2); }
+
+/* --------------------------------- แถบเตือน --------------------------------- */
+
+.orv-banners { display: grid; gap: 8px; }
+.orv-banners:empty { display: none; }
+.orv-banner { margin: 0; padding: 10px 12px; border-radius: 14px; display: grid; gap: 2px; font-size: 13.5px; line-height: 1.5; }
+.orv-banner strong { font-size: 14px; }
+.orv-banner.is-warn { background: var(--warm-soft); color: var(--warm-ink); border: 1px solid var(--warm-track, var(--line)); }
+.orv-banner.is-info { background: var(--cold-soft); color: var(--cold-ink); border: 1px solid var(--cold-track, var(--line)); }
+
+/* ------------------------------- ความคืบหน้า ------------------------------- */
+
+.orv-progress { display: flex; align-items: center; gap: 12px; padding: 0 2px; }
+.orv-progress-label { min-width: 44px; font-size: 13px; font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.orv-progress-track { flex: 1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.orv-progress-fill {
+  display: block; width: 100%; height: 100%; border-radius: inherit;
+  background: var(--grad-brand, var(--brand));
+  transform-origin: left center; transform: scaleX(var(--orv-progress, 0));
+  transition: transform 320ms var(--ease);
+}
+
+/* --------------------------------- กองการ์ด --------------------------------- */
+
+/* ใบถัดไป (และใบถัดจากนั้น) โผล่ "เหนือ" ขอบบนของใบบน — สีจาง ๆ ตามหมวดของห้องถัดไป
+   รีวิว 12 ต.ค. ค่ำ: เดิมโผล่ใต้ใบบน แต่ตรงนั้นคือแถบปุ่มติดขอบล่าง (ทึบ) จึงไม่เคยเห็นตอนอยู่นิ่ง (320px ไม่เห็นเลย)
+   ใบหลังสูงเต็มกอง (bottom: 0) — ตอนปัดใบบนออกจะเห็นใบถัดไปรออยู่ข้างหลังจริง ๆ */
+.orv-stack { position: relative; padding-top: 20px; }
+.orv-stack.is-empty { padding-top: 0; }
+.orv-stack::before, .orv-stack::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none;
+  border-radius: var(--orv-radius);
+  background: color-mix(in srgb, var(--orv-next, var(--line-2)) 9%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--orv-next, var(--line-2)) 26%, var(--line));
+  box-shadow: var(--shadow-1);
+  transform-origin: 50% 0; opacity: 0;
+  transition: opacity 200ms var(--ease);
+}
+.orv-stack::before { top: 10px; transform: scale(0.95); z-index: 1; }
+.orv-stack::after { top: 0; transform: scale(0.9); z-index: 0; }
+.orv-stack.has-next::before { opacity: 1; }
+.orv-stack.has-next2::after { opacity: 0.7; }
+
+.orv-card {
+  position: relative; z-index: 2; overflow: hidden;
+  display: grid; gap: 14px; padding: 18px 16px 12px;
+  border-radius: var(--orv-radius);
+  background:
+    radial-gradient(130% 110px at 0% 0%, color-mix(in srgb, var(--orv-accent) 15%, transparent), transparent 72%),
+    var(--surface);
+  border: 1px solid color-mix(in srgb, var(--orv-accent) 22%, var(--line));
+  box-shadow: 0 1px 2px rgba(20, 16, 32, 0.06), 0 22px 44px -26px color-mix(in srgb, var(--orv-accent) 60%, transparent);
+  touch-action: pan-y;
+  transform: translate3d(var(--swipe-x, 0px), 0, 0) rotate(var(--swipe-r, 0deg));
+  transition: transform var(--orv-dur) var(--ease), opacity var(--orv-dur) var(--ease);
+}
+.orv-card.is-dragging { transition: none; will-change: transform; cursor: grabbing; }
+.orv-card.is-leaving-right { transform: translate3d(115%, -6px, 0) rotate(8deg); opacity: 0; }
+.orv-card.is-leaving-left { transform: translate3d(-115%, -6px, 0) rotate(-8deg); opacity: 0; }
+/* backwards (ไม่ใช่ both) — จบโมชันแล้วต้องคืน transform ให้การปัดควบคุมต่อได้ */
+.orv-card.is-entering { animation: orv-rise 260ms var(--ease) backwards; }
+.orv-card.is-returning { animation: orv-return 280ms var(--ease) backwards; }
+/* ใบใหม่ = ใบที่รออยู่ข้างหลัง (เหนือขอบ) ขยับขึ้นมาข้างหน้า */
+@keyframes orv-rise {
+  from { opacity: 0.45; transform: translate3d(0, -12px, 0) scale(0.95); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes orv-return {
+  from { opacity: 0; transform: translate3d(55%, 0, 0) rotate(6deg); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+/* ตราที่ค่อย ๆ ชัดตอนปัด — ขวา = ไม่ปิด · ซ้าย = ปิดแชท */
+.orv-stamp {
+  position: absolute; top: 16px; z-index: 3; pointer-events: none;
+  padding: 5px 12px; border-radius: 10px; border: 2px solid currentColor;
+  font-weight: 800; font-size: 15px; letter-spacing: 0.02em; background: var(--surface);
+}
+.orv-stamp.is-keep { left: 14px; color: var(--green); transform: rotate(-8deg); opacity: var(--swipe-keep, 0); }
+.orv-stamp.is-close {
+  right: 14px; color: var(--qualify-ink); background: var(--qualify); border-color: var(--qualify-ink);
+  transform: rotate(8deg); opacity: var(--swipe-close, 0);
+}
+
+.orv-card-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.orv-avatar {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: 18px; color: var(--orv-chip-ink); background: var(--orv-chip-bg);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--orv-accent) 40%, transparent);
+}
+.orv-who { min-width: 0; }
+.orv-name { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+/* หัวที่รับโฟกัสจากโค้ด (หลังตัดสิน/เปิดแผ่น) — เห็นวงโฟกัสเมื่อใช้คีย์บอร์ด ไม่โผล่ตอนแตะ */
+.orv-name:focus, .orv-empty-title:focus, .orv-sheet-title:focus { outline: none; }
+.orv-name:focus-visible, .orv-empty-title:focus-visible, .orv-sheet-title:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 6px;
+}
+.orv-sub { margin: 2px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; color: var(--ink-2); font-size: 13.5px; }
+.orv-chan { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ink); }
+.orv-chan::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--orv-chan-dot, var(--green)); }
+.orv-chan.is-line { --orv-chan-dot: var(--orv-line-green); }
+.orv-chan.is-fb { --orv-chan-dot: var(--orv-fb-blue); }
+
+.orv-why { display: grid; gap: 10px; justify-items: start; }
+.orv-chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 6px 13px 6px 10px; border-radius: 999px;
+  font-size: 14px; font-weight: 700; line-height: 1.3;
+  color: var(--orv-chip-ink); background: var(--orv-chip-bg);
+  border: 1px solid color-mix(in srgb, var(--orv-accent) 35%, transparent);
+}
+.orv-chip-ico { flex: none; width: 16px; height: 16px; }
+.orv-reason {
+  margin: 0; padding-left: 12px; border-left: 3px solid color-mix(in srgb, var(--orv-accent) 70%, transparent);
+  display: grid; gap: 1px; font-size: 15px; line-height: 1.55; color: var(--ink); overflow-wrap: anywhere;
+}
+.orv-reason-k { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+
+.orv-notice { margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 14px; line-height: 1.5; font-weight: 600; }
+.orv-notice.is-warn { background: var(--warm-soft); color: var(--warm-ink); border: 1px solid var(--warm-track, var(--line)); }
+.orv-notice.is-info { background: var(--cold-soft); color: var(--cold-ink); }
+.orv-notice.is-danger { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line); }
+
+/* บทสนทนาย่อ — หน้าต่างแชทเล็ก ๆ ฝังในการ์ด */
+.orv-thread { display: grid; gap: 8px; padding: 10px; border-radius: 18px; background: var(--surface-2); }
+.orv-thread.is-failed { justify-items: center; text-align: center; color: var(--ink-2); font-size: 14px; }
+.orv-thread.is-failed p { margin: 0; }
+.orv-thread-empty { margin: 0; text-align: center; color: var(--ink-3); font-size: 13.5px; }
+.orv-more {
+  justify-self: center; min-height: 36px; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 13px; font-weight: 600;
+  transition: border-color 150ms var(--ease), color 150ms var(--ease);
+}
+.orv-more:hover { border-color: var(--line-2); color: var(--ink); }
+.orv-more:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.orv-msgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.orv-msg { max-width: 86%; display: grid; gap: 2px; min-width: 0; }
+.orv-msg.is-in { justify-self: start; }
+.orv-msg.is-out { justify-self: end; justify-items: end; }
+.orv-msg-text {
+  margin: 0; padding: 8px 12px; border-radius: 16px; color: var(--ink);
+  font-size: 14.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.orv-msg.is-in .orv-msg-text { background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+.orv-msg.is-out .orv-msg-text { background: var(--bubble-ai, var(--brand-50)); border-bottom-right-radius: 6px; }
+.orv-msg.is-staff .orv-msg-text { background: var(--green-soft); }
+.orv-msg.is-new .orv-msg-text { box-shadow: 0 0 0 2px var(--warm); }
+.orv-msg-meta { display: inline-flex; align-items: center; gap: 6px; padding: 0 4px; font-size: 11.5px; color: var(--ink-3); }
+.orv-msg-new { padding: 0 6px; border-radius: 6px; font-weight: 700; color: var(--warm-ink); background: var(--warm-soft); }
+
+.orv-thread.is-loading { gap: 8px; }
+.orv-skel {
+  display: block; width: 70%; height: 34px; border-radius: 14px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  animation: orv-pulse 1.1s ease-in-out infinite alternate;
+}
+.orv-skel.is-out { justify-self: end; width: 60%; }
+.orv-skel.is-short { width: 42%; }
+@keyframes orv-pulse { from { opacity: 0.45; } to { opacity: 1; } }
+
+.orv-card-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 10px; font-size: 12.5px; color: var(--ink-3); }
+.orv-open {
+  min-height: 36px; display: inline-flex; align-items: center; padding: 0 6px; border-radius: 8px;
+  color: var(--brand-ink); font-weight: 600; text-decoration: none;
+}
+.orv-open:hover { text-decoration: underline; }
+.orv-open:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+/* -------------------------------- ปุ่มตัดสิน -------------------------------- */
+
+/* คำใบ้การปัด: เหนือกองการ์ด บอกครั้งเดียวตอนเริ่ม (เดิมอยู่ใต้กอง = โดนแถบปุ่มทับ) */
+.orv-swipe-hint { margin: -4px 0 -8px; text-align: center; font-size: 12.5px; color: var(--ink-3); }
+/* bottom: 0 — กรอบติดขอบของ sticky หักระยะ padding-bottom ของ .page-scroll (= ความสูงแถบล่าง) ให้แล้ว
+   ใส่ var(--tabbar-h) ซ้ำ = ลอยสูงเกินแถบล่างไปอีกเท่าตัว (เจอในพรีวิว 375px)
+   margin-top: auto = ดันแถบลงขอบล่างเสมอเมื่อการ์ดสั้น · แถบย้อนอยู่ในนี้ (ในโฟลว์) เลื่อนการ์ดขึ้นมาเหนือได้เสมอ */
+.orv-thumb {
+  position: sticky; bottom: 0; z-index: 4;
+  display: grid; gap: 10px;
+  margin: auto calc(-1 * var(--orv-gutter)) 0; padding: 14px var(--orv-gutter) 12px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 0%, transparent), var(--bg) 30%);
+}
+.orv-thumb.is-bare { padding-top: 0; padding-bottom: 0; background: none; }
+.orv-thumb.is-bare .orv-toast-host:not(:empty) { padding-bottom: 12px; }
+.orv-toast-host:empty { display: none; }
+.orv-thumb-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.orv-act {
+  min-height: var(--orv-act-h); border-radius: 18px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-size: 16.5px; font-weight: 700; line-height: 1.2;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform 120ms var(--ease), box-shadow 150ms var(--ease), border-color 150ms var(--ease), opacity 150ms var(--ease);
+}
+.orv-act.is-close {
+  color: var(--qualify-ink); background: var(--qualify);
+  border: 1px solid color-mix(in srgb, var(--qualify-ink) 22%, var(--qualify));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 10px 22px -12px color-mix(in srgb, var(--qualify) 85%, transparent);
+}
+.orv-act.is-keep { color: var(--ink); background: var(--surface); border: 1.5px solid var(--line-2); box-shadow: var(--shadow-1); }
+.orv-act.is-keep:hover:not(:disabled) { border-color: var(--green); }
+.orv-act.is-close:hover:not(:disabled) { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 14px 26px -12px color-mix(in srgb, var(--qualify) 95%, transparent); }
+.orv-act:active:not(:disabled) { transform: scale(0.97); }
+.orv-act:disabled { opacity: 0.5; cursor: not-allowed; }
+.orv-act:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.orv-act-hint { font-size: 20px; font-weight: 400; opacity: 0.55; transition: transform 150ms var(--ease); }
+.orv-act.is-close:hover:not(:disabled) .orv-act-hint { transform: translateX(-3px); }
+.orv-act.is-keep:hover:not(:disabled) .orv-act-hint { transform: translateX(3px); }
+
+/* --------------------------------- หน้าว่าง --------------------------------- */
+
+.orv-empty {
+  display: grid; gap: 10px; justify-items: center; text-align: center;
+  padding: 36px 20px 30px; border-radius: var(--orv-radius);
+  background:
+    radial-gradient(120% 160px at 50% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 75%),
+    var(--surface);
+  border: 1px solid var(--line); box-shadow: var(--shadow-1);
+}
+.orv-empty-title { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.35; }
+.orv-empty-done { margin: 0; color: var(--ink-2); font-size: 14px; }
+.orv-empty-next {
+  margin: 4px 0 0; display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 8px 18px; border-radius: 999px; background: var(--brand-50); color: var(--brand-ink); font-size: 14px;
+}
+.orv-empty-next strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.orv-empty-last { margin: 0; max-width: 36ch; color: var(--ink-2); font-size: 13.5px; }
+.orv-today { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.orv-today li {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 12px; border-radius: 12px;
+  background: var(--surface-2); color: var(--ink-2); font-size: 13px;
+}
+.orv-today strong { font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.orv-nowrap { white-space: nowrap; }
+
+/* ---------------------------- แผ่นยืนยันปิด (sheet) ---------------------------- */
+
+.orv-sheet-layer { position: fixed; inset: 0; z-index: var(--z-sheet, 30); display: flex; align-items: flex-end; justify-content: center; }
+.orv-scrim { position: absolute; inset: 0; background: rgba(20, 10, 18, 0.46); animation: orv-fade 200ms var(--ease) both; }
+.orv-sheet {
+  position: relative; width: 100%; max-width: 560px; max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain;
+  display: grid; gap: 12px; padding: 10px 18px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 26px 26px 0 0; background: var(--surface); color: var(--ink);
+  box-shadow: 0 -18px 40px -16px rgba(0, 0, 0, 0.35);
+  animation: orv-sheet-up 260ms var(--ease) both;
+}
+.orv-sheet-layer.is-closing .orv-sheet { animation: orv-sheet-down 180ms var(--ease) both; }
+.orv-sheet-layer.is-closing .orv-scrim { animation: orv-fade-out 180ms var(--ease) both; }
+@keyframes orv-sheet-up { from { transform: translate3d(0, 100%, 0); } to { transform: translate3d(0, 0, 0); } }
+@keyframes orv-sheet-down { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, 100%, 0); } }
+@keyframes orv-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes orv-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.orv-sheet-grab { justify-self: center; width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); }
+.orv-sheet-title { margin: 4px 0 0; font-size: 19px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.orv-sheet-desc { margin: -4px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+.orv-goodbye { margin: 0; display: grid; gap: 6px; padding: 12px; border-radius: 18px; background: var(--surface-2); }
+.orv-goodbye-cap { font-size: 12.5px; font-weight: 600; color: var(--ink-3); }
+.orv-goodbye-text {
+  justify-self: end; max-width: 92%; margin: 0; padding: 10px 14px; border-radius: 18px 18px 6px 18px;
+  background: var(--bubble-ai, var(--brand-50)); color: var(--ink);
+  font-size: 15px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.orv-goodbye.is-muted .orv-goodbye-text { opacity: 0.55; }
+.orv-sheet-blocked { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--warm-soft); color: var(--warm-ink); font-size: 13.5px; line-height: 1.5; }
+.orv-sheet-warn { margin: 0; font-size: 13px; font-weight: 700; color: var(--red); }
+.orv-sheet-error {
+  margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 13.5px; font-weight: 600; line-height: 1.5;
+  background: var(--red-soft); color: var(--red); border: 1px solid var(--red-line);
+}
+.orv-sheet-actions { display: grid; gap: 8px; margin-top: 2px; }
+.orv-sheet-btn {
+  min-height: 54px; border-radius: 16px; cursor: pointer; border: 1px solid transparent;
+  font: inherit; font-size: 16px; font-weight: 700; line-height: 1.25; padding: 8px 14px;
+  transition: transform 120ms var(--ease), opacity 150ms var(--ease), border-color 150ms var(--ease);
+}
+.orv-sheet-btn.is-close {
+  color: var(--qualify-ink); background: var(--qualify);
+  border-color: color-mix(in srgb, var(--qualify-ink) 22%, var(--qualify));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.orv-sheet-btn.is-silent { color: var(--ink); background: var(--surface); border-color: var(--line-2); }
+.orv-sheet-btn.is-silent:hover:not(:disabled) { border-color: var(--ink-3); }
+.orv-sheet-btn.is-cancel { min-height: 48px; color: var(--ink-2); background: transparent; }
+.orv-sheet-btn:active:not(:disabled) { transform: scale(0.98); }
+.orv-sheet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.orv-sheet-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+/* ------------------------------ แถบย้อน "ไม่ปิด" ------------------------------ */
+/* บรรทัดเดียวในแถบปุ่มล่าง (ในโฟลว์) — รีวิว 12 ต.ค. ค่ำ: แถบลอยสูง 136px เดิมทับข้อความล่าสุดของห้องถัดไป
+   และลอยทับแผ่นยืนยันปิด (z 50 > 30) จนแตะ "ส่งคำลา" แล้วไปโดนชิปเหตุผลของห้องก่อน · ตอนนี้อยู่ใต้แผ่นเสมอ */
+.orv-undo {
+  position: relative; overflow: hidden;
+  display: grid; gap: 8px; padding: 6px 6px 8px 14px; border-radius: 16px;
+  background: var(--ink); color: var(--surface);
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.5);
+  transform: translate3d(0, 10px, 0); opacity: 0;
+  transition: transform 220ms var(--ease), opacity 200ms var(--ease);
+}
+.orv-undo.is-shown { transform: translate3d(0, 0, 0); opacity: 1; }
+.orv-undo-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.orv-undo-copy { flex: 1; min-width: 0; margin: 0; display: grid; gap: 1px; }
+.orv-undo-title { font-size: 14.5px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.orv-undo-sub { font-size: 12px; line-height: 1.4; opacity: 0.82; overflow-wrap: anywhere; }
+.orv-undo-why, .orv-undo-btn {
+  flex: none; min-height: 44px; border-radius: 12px; cursor: pointer;
+  font: inherit; font-weight: 700; color: var(--surface);
+  transition: background-color 150ms var(--ease), color 150ms var(--ease), opacity 150ms var(--ease);
+}
+.orv-undo-why {
+  padding: 0 11px; font-size: 13.5px; border: 0;
+  background: color-mix(in srgb, var(--surface) 13%, transparent);
+}
+.orv-undo-why.is-open { background: var(--surface); color: var(--ink); }
+.orv-undo-btn {
+  min-width: 72px; padding: 0 12px; font-size: 15px; font-variant-numeric: tabular-nums;
+  border: 1.5px solid color-mix(in srgb, var(--surface) 55%, transparent); background: transparent;
+}
+.orv-undo-btn:disabled, .orv-undo-why:disabled { opacity: 0.5; cursor: default; }
+.orv-undo-reasons { display: flex; flex-wrap: wrap; gap: 6px; padding-right: 8px; }
+.orv-reason-chip {
+  min-height: 40px; padding: 4px 13px; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--surface) 38%, transparent);
+  background: color-mix(in srgb, var(--surface) 10%, transparent); color: var(--surface);
+  font: inherit; font-size: 13px;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+.orv-reason-chip:disabled { opacity: 0.55; cursor: default; }
+.orv-reason-chip.is-picked { opacity: 1; background: var(--surface); color: var(--ink); }
+.orv-undo-btn:focus-visible, .orv-undo-why:focus-visible, .orv-reason-chip:focus-visible { outline: 2px solid var(--surface); outline-offset: 2px; }
+.orv-undo-bar {
+  position: absolute; left: 0; bottom: 0; width: 100%; height: 3px;
+  background: var(--qualify); transform-origin: left center; transform: scaleX(1);
+}
+.orv-undo-bar.is-running { transform: scaleX(0); transition: transform var(--orv-undo-ms, 9000ms) linear; }
+
+.orv-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+/* --------------------------- การ์ดทางเข้าบนหน้าภาพรวม --------------------------- */
+
+.ov-orv {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px;
+  border-radius: 16px; text-decoration: none; color: var(--ink);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--qualify) 20%, var(--surface)), var(--surface) 72%);
+  border: 1px solid color-mix(in srgb, var(--qualify) 55%, var(--line));
+  box-shadow: var(--shadow-1);
+  transition: transform 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.ov-orv:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); }
+.ov-orv:active { transform: scale(0.99); }
+.ov-orv:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.ov-orv-ico { flex: none; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--qualify); color: var(--qualify-ink); }
+.ov-orv-copy { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.ov-orv-title { font-size: 16px; font-weight: 700; }
+.ov-orv-sub { font-size: 12.5px; color: var(--ink-2); }
+.ov-orv-go { font-size: 22px; line-height: 1; color: var(--ink-3); }
+
+/* ---------------------------------- จอกว้าง ---------------------------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .orv-swipe-hint { display: none; }
+}
+@media (min-width: 1024px) {
+  .orv { padding-top: 20px; }
+  .orv-thumb { padding-bottom: 20px; }
+}
+
+/* เจน 12 ต.ค. ค่ำ (ดูในพรีวิว 375px): แถบย้อนอยู่เหนือปุ่มล่างแล้วบังข้อความล่าสุดของห้องถัดไป 10 วิ — ข้อความล่าสุดคือสิ่งที่ใช้ตัดสิน
+   ย้ายแถบย้อนไปลอยด้านบน (ใต้หัวเพจ ทับแถบแท็บ/ความคืบหน้าแค่ชั่วคราว) · z ต่ำกว่าแผ่นยืนยันปิด (--z-sheet) จึงไม่ทับปุ่มส่งคำลา */
+.orv-toast-host:not(:empty) {
+  position: fixed; z-index: calc(var(--z-sheet) - 1);
+  top: calc(env(safe-area-inset-top) + 66px); left: var(--orv-gutter, 16px); right: var(--orv-gutter, 16px);
+  max-width: 560px; margin-inline: auto; padding: 0;
+}
+.orv-thumb.is-bare .orv-toast-host:not(:empty) { padding-bottom: 0; }
+.orv-undo { transform: translate3d(0, -10px, 0); }
+.orv-undo.is-shown { transform: translate3d(0, 0, 0); }
+@media (prefers-reduced-motion: reduce) { .orv-undo, .orv-undo.is-shown { transform: none; transition: opacity 120ms linear; } }

@@ -1,0 +1,203 @@
+/* triage.css — คัดห้องบนคอนโซล (28 ก.ย. 2026): คิว "รอตอบ" · ปุ่มลัดบนแถว · สแปม · AI ปิดเพราะใคร
+   ใช้ token สีของธีมเท่านั้น (ทุกธีมมีครบทั้งสว่าง/มืด — คู่ --purple/--purple-soft กับ --red/--red-soft
+   ผ่าน 4.5:1 อยู่แล้วใน test/console-theme-tokens.test.mjs) · ไม่มี inline style (CSP style-src 'self')
+
+   ความหมายของสี (คำสั่งพี่ง้วง): ม่วง = AI ปิดโดยคน (สีกลุ่ม CI ลูกแพร) · แดง = AI ปิดโดยระบบ
+   · เทา = ห้องเก่าที่ไม่มีบันทึกว่าใครปิด · ส้ม = Facebook ตอบจากคอนโซลไม่ได้แล้ว (ต้องไป Business Suite)
+   · เหลืองสด = AI off (not qualify) ตัวกวาดรายชั่วโมงคัดกรองว่ายังไม่เข้าเกณฑ์ (5 ต.ค. 2026 — token --qualify*
+     แยกจากเหลืองอำพัน --warm-* ของ "AI พัก"/"กำลังพิจารณา" · เทสต์คุมทั้ง 4.5:1 และโทนต้องไม่ชนกัน) */
+
+/* ---------------------------- ชิปคิว (หน้าแชท) ---------------------------- */
+
+.fchip-waiting .fchip-count, .fchip-waiting24 .fchip-count { background: var(--red-soft); color: var(--red); }
+.fchip-waiting.is-active, .fchip-waiting24.is-active { background: var(--red); border-color: var(--red); }
+.fchip-waiting.is-active .fchip-count, .fchip-waiting24.is-active .fchip-count { background: rgba(255, 255, 255, 0.24); color: inherit; }
+/* 30 ก.ย. 2026: คิวลูกค้าร้อนรอทีมทักต่อ — โทนส้มร้อน แยกจากแดงของคิวรอตอบ */
+.fchip-hotfollow .fchip-count { background: var(--orange-soft); color: var(--orange); }
+.fchip-hotfollow.is-active { background: var(--orange); border-color: var(--orange); color: #fff; }
+.fchip-hotfollow.is-active .fchip-count { background: rgba(255, 255, 255, 0.24); color: inherit; }
+.badge-hotfollow { background: var(--orange-soft); color: var(--orange); }
+.fchip-spam.is-active { background: var(--ink-3); border-color: var(--ink-3); }
+/* 5 ต.ค. 2026: ชิป "ไม่เข้าเกณฑ์" = ห้องเหลือง — ตัวเลขเป็นเม็ดเหลืองแบบเดียวกับป้ายบนแถว · เลือกอยู่ = ทั้งชิปเหลือง
+   ตัวหนังสือเข้ม (ตัวขาวบนเหลืองอ่านไม่ออก) · ธีมลูกแพรมีกฎชิปที่เลือกอยู่ของตัวเอง จึงซ้ำไว้ใน theme-lukprae.css */
+.fchip-notqualify .fchip-count { background: var(--qualify); color: var(--qualify-ink); }
+.fchip-notqualify.is-active { background: var(--qualify); border-color: var(--qualify-ink); color: var(--qualify-ink); }
+.fchip-notqualify.is-active .fchip-count { background: color-mix(in srgb, var(--qualify-ink) 14%, transparent); color: inherit; }
+
+/* ------------------------------ ป้ายสถานะ ------------------------------ */
+
+.ai-off-badge { box-shadow: inset 0 0 0 1px currentColor; }
+.ai-off-badge.by-human { background: var(--purple-soft); color: var(--purple); }
+.ai-off-badge.by-system { background: var(--red-soft); color: var(--red); }
+.ai-off-badge.by-unknown { background: var(--neutral-soft); color: var(--ink-2); box-shadow: none; }
+.ai-off-why { font-weight: 500; }
+.ai-off-reason { align-self: center; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+.ai-off-reason.by-system { color: var(--red); }
+.ai-off-reason.by-human { color: var(--purple); }
+/* ห้องเหลือง: ป้ายเหลืองสด ตัวหนังสือเข้ม (วงขอบ currentColor จากกฎ .ai-off-badge ทำให้เห็นรูปป้ายบนพื้นขาว)
+   · เหตุเป็นตัวหนังสือหลักบนพื้นเหลืองอ่อน (เหลืองเป็นตัวหนังสือบนพื้นขาวไม่ผ่าน 4.5:1) */
+.ai-off-badge.by-qualify { background: var(--qualify); color: var(--qualify-ink); }
+.ai-off-reason.by-qualify { color: var(--ink); background: var(--qualify-soft); border-radius: 6px; padding: 0 6px; }
+.ai-on-badge { background: var(--green-soft); color: var(--green); }
+.ai-on-badge.is-paused { background: var(--warm-soft); color: var(--warm-ink); }
+.badge-fb-closed { background: var(--orange-soft); color: var(--orange); box-shadow: inset 0 0 0 1px var(--orange-line); }
+.badge-channel { background: var(--neutral-soft); color: var(--ink-2); }
+.value-badge.is-money { background: var(--green-soft); color: var(--green); }
+.value-badge.is-hot { background: var(--hot-soft); color: var(--hot-ink); }
+.value-badge.is-warm { background: var(--warm-soft); color: var(--warm-ink); }
+
+/* สวิตช์ AI ในหัวห้อง — ของเดิม .ai-toggle.is-off เป็นแดง (= โดยระบบ) · คนปิดเองเป็นม่วง */
+.ai-toggle.is-off.by-human { background: var(--purple-soft); color: var(--purple); }
+.ai-toggle.is-off.by-unknown { background: var(--neutral-soft); color: var(--ink-2); }
+/* ห้องเหลือง (ตัวกวาดคัดกรองปิด): ปุ่มเหลืองสด — กดแล้วเปิด AI ทับผลคัดกรองได้เหมือนห้องอื่น */
+.ai-toggle.is-off.by-qualify { background: var(--qualify); color: var(--qualify-ink); }
+
+/* ------------------------- แถวคิวรอตอบ (รายการแชท) ------------------------- */
+
+.convo-item { position: relative; border-bottom: 1px solid var(--line); transition: background-color 0.12s var(--ease); }
+.convo-item > .convo-row { border-bottom: none; }
+/* แถวกับปุ่มลัดคือห้องเดียวกัน — ไฮไลต์ทั้งก้อน ไม่ใช่แค่ส่วนที่เป็นลิงก์ */
+.convo-item:hover { background: var(--surface-2); }
+.convo-item > .convo-row:hover, .convo-item > .convo-row.is-active { background: transparent; }
+.convo-item.is-active, .convo-item.is-active:hover { background: var(--brand-50); }
+.convo-row.is-waiting { align-items: flex-start; padding-bottom: 4px; }
+.convo-row.is-waiting .convo-main { gap: 4px; }
+.convo-badges { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.convo-row.is-waiting .preview { flex: none; display: block; }
+.convo-wait {
+  flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.convo-wait.is-long { color: var(--danger); }
+.convo-top-end { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+/* ปุ่มลัดบนแถว (✓ เสร็จสิ้น / สแปม / ไม่ใช่สแปม) — อยู่นอกลิงก์ของแถวเสมอ */
+.row-actions { display: flex; gap: 6px; align-items: center; }
+.convo-item > .row-actions { padding: 0 12px 10px 63px; }
+.row-act {
+  min-height: 32px; padding: 4px 11px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.row-act:hover { color: var(--ink); border-color: var(--ink-3); }
+.row-act.is-done:hover { color: var(--green); border-color: var(--green); background: var(--green-soft); }
+.row-act.is-spam:hover { color: var(--red); border-color: var(--red-line); background: var(--red-soft); }
+.row-act.is-unspam:hover { color: var(--purple); border-color: var(--purple-line); background: var(--purple-soft); }
+.row-act:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.row-act:disabled { opacity: 0.55; cursor: progress; }
+
+/* ------------------------ แถวคิวบนหน้าภาพรวม ------------------------ */
+
+.ov-q-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+/* 29 ก.ย. 2026: แถวลูกค้าร้อนเงียบไป — ลูกแพรทำอะไรแล้ว + ทีมต้องทำอะไรต่อ */
+.ov-q-note { font-size: 12px; color: var(--ink-2); }
+.ov-q-note + .ov-q-note::before { content: "· "; }
+.ov-q-note.is-urgent { color: var(--orange); font-weight: 600; }
+.ov-q-item.has-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 4px; }
+.ov-q-item.has-actions > .row-actions { flex-direction: column; align-items: stretch; gap: 4px; padding-right: 2px; }
+.ov-sec-links { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-left: auto; justify-content: flex-end; }
+.ov-sec-foot .ov-sec-links .ov-sec-link { margin-left: 0; }
+/* 29 ก.ย. 2026: ตัวชี้วัด "ทีมทักต่อ" ข้างลิงก์ลูกค้าร้อนทั้งหมด */
+.ov-sec-links .ov-team-rate { align-self: center; font-variant-numeric: tabular-nums; }
+.ov-sec-link.is-primary { color: var(--brand-ink); }
+
+@media (max-width: 599.98px) {
+  /* จอโทรศัพท์: ปุ่มลัดย้ายลงบรรทัดใต้แถว ชิดขวา ไม่เบียดชื่อ/เวลารอ */
+  .ov-q-item.has-actions { grid-template-columns: minmax(0, 1fr); }
+  .ov-q-item.has-actions > .row-actions { flex-direction: row; justify-content: flex-end; padding: 0 6px 8px; }
+}
+
+/* ------------------------------ หัวห้องแชท ------------------------------ */
+
+.spam-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; color: var(--ink-2); border: 1px solid var(--line-2);
+}
+.spam-btn:hover { color: var(--red); border-color: var(--red-line); background: var(--red-soft); }
+.spam-btn-icon { font-size: 13px; line-height: 1; }
+
+/* แถบคิวใต้หัวห้อง: ลำดับในคิว · เวลารอ · Facebook ตอบไม่ได้ · ห้องถัดไป */
+.triage-bar {
+  flex-shrink: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px;
+  padding: 7px 14px; background: var(--surface); border-bottom: 1px solid var(--line);
+  box-shadow: inset 3px 0 0 var(--red);
+}
+.triage-bar.is-clear { box-shadow: inset 3px 0 0 var(--green); }
+.triage-bar.is-spam { box-shadow: inset 3px 0 0 var(--purple); background: var(--purple-soft); }
+.triage-bar.is-hotfollow { box-shadow: inset 3px 0 0 var(--orange); }
+.triage-bar-hot { color: var(--orange); }
+.triage-bar-status { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; min-width: 0; font-size: 13px; }
+.triage-bar-wait { color: var(--danger); font-variant-numeric: tabular-nums; }
+.triage-bar-done { color: var(--green); }
+.triage-bar.is-spam strong { color: var(--purple); }
+.triage-bar-pos { color: var(--ink-2); font-size: 12.5px; }
+.triage-bar-why { font-size: 12.5px; color: var(--ink-2); }
+.triage-bar-why.by-system { color: var(--red); }
+.triage-bar-why.by-human { color: var(--purple); }
+.triage-bar-why.by-qualify { color: var(--ink); background: var(--qualify-soft); border-radius: 6px; padding: 0 6px; }
+.triage-next {
+  margin-left: auto; display: inline-flex; align-items: center; text-decoration: none; white-space: nowrap;
+  background: var(--ink); color: var(--surface); border: 1px solid var(--ink);
+}
+.triage-next:hover { background: var(--ink-2); border-color: var(--ink-2); }
+.triage-next.is-last { background: transparent; color: var(--ink-3); border: none; font-size: 12.5px; }
+.triage-unspam { margin-left: auto; background: var(--surface); color: var(--purple); border: 1px solid var(--purple-line); }
+.triage-unspam:hover { border-color: var(--purple); }
+
+/* Facebook เกิน 24 ชม.: บอกก่อนพิมพ์ — กดส่งแล้วล้มคือเสียเวลาทั้งทีมและลูกค้า */
+.fb-window-banner {
+  display: flex; flex-direction: column; gap: 1px; margin: 0 0 8px; padding: 8px 12px;
+  border-radius: 12px; border: 1px solid var(--orange-line); background: var(--orange-soft); color: var(--orange);
+  font-size: 12.5px; line-height: 1.45;
+}
+.fb-window-banner strong { font-size: 13px; }
+/* 28 ก.ย. 2026: ลิงก์เปิดห้องเดียวกันใน Business Suite */
+.fb-window-banner .fb-suite-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.fb-window-banner .fb-suite-link { text-decoration: none; }
+a.badge-fb-closed.is-link { text-decoration: none; cursor: pointer; }
+a.badge-fb-closed.is-link:hover, a.badge-fb-closed.is-link:focus-visible { text-decoration: underline; }
+
+/* หัวห้องแคบ (โทรศัพท์ · เดสก์ท็อปที่เปิดแผงข้อมูลลูกค้าแล้วห้องแชทเหลือไม่ถึง 640px):
+   เดิมหัวห้องแถวเดียวแน่นจนชื่อลูกค้าเหลือ 16px (วัดจริง 390px — ดู yolo.css) พอมีป้าย "AI ปิด · โดยคน/ระบบ"
+   กับปุ่มสแปมเพิ่ม ปุ่มหลุดขอบจอ → แยกเป็นสองแถว: แถวบน = ใครคือลูกค้า (กลับ · รูป · ชื่อ · ● · ⓘ)
+   แถวล่าง = สิ่งที่ทำกับห้อง (AI · ✓ เสร็จสิ้น · สแปม · YOLO บนเดสก์ท็อป) — วัดจากความกว้างห้องแชทจริง
+   (container query) ไม่ใช่ความกว้างจอ เพราะเดสก์ท็อป 1024–1400 ที่เปิดแผงขวาก็แคบเท่ามือถือ */
+.chat-pane { container: chatpane / inline-size; }
+@container chatpane (max-width: 640px) {
+  .chat-head { position: relative; flex-wrap: wrap; row-gap: 8px; }
+  .chat-head::after { content: ""; order: 1; flex-basis: 100%; height: 0; }
+  .chat-head > .ai-toggle, .chat-head > .btn-mini, .chat-head > .yolo-anchor { order: 2; }
+  .chat-head > .ai-toggle { min-height: 36px; }
+  /* แถบคิว: สถานะ + "ห้องถัดไป" อยู่แถวแรกเสมอ ป้าย Facebook ลงแถวสอง (ไม่ดันปุ่มตกไปแถวสาม) */
+  .triage-bar > .badge-fb-closed { order: 3; }
+}
+@media (max-width: 720px) {
+  /* ปุ่ม ⚡ ลอยของ YOLO (yolo.css) เคยปักไว้ที่ 70px จากขอบบน = ใต้หัวห้องแถวเดียวพอดี
+     หัวห้องสองแถวสูงขึ้น → ห้อยใต้หัวห้องแทน (สูงเท่าไรก็ไม่ทับปุ่มในหัวห้อง) · แถบคิวเว้นที่ขวาให้ปุ่มนี้ */
+  .chat-head .yolo-btn { position: absolute; top: calc(100% + 8px); right: 12px; }
+  .chat-pane:has(.yolo-btn) .triage-bar { padding-right: 66px; }
+  .triage-bar { padding-top: 6px; padding-bottom: 6px; }
+}
+
+/* ช่องกลางตอนยังไม่เปิดห้อง (เดสก์ท็อป) ในคิวรอตอบ: ปุ่มเปิดห้องบนสุด */
+.chat-empty-go { display: inline-flex; align-items: center; margin-top: 14px; text-decoration: none; }
+
+/* ------------------------------ กล่องยืนยันสแปม ------------------------------ */
+
+.spam-dialog {
+  width: min(440px, calc(100vw - 32px)); padding: 22px 22px 18px; border-radius: 18px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-2);
+}
+.spam-dialog::backdrop { background: rgba(20, 12, 20, 0.48); }
+.spam-dialog-title { margin: 0 0 10px; font-size: 17px; font-weight: 700; line-height: 1.4; }
+.spam-dialog-list { margin: 0 0 10px; padding-inline-start: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: 14px; }
+.spam-dialog-note { margin: 0 0 16px; color: var(--ink-3); font-size: 12.5px; }
+.spam-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.btn-spam-confirm { background: var(--red); color: var(--surface); }
+.btn-spam-confirm:hover { filter: brightness(0.96); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .spam-dialog[open] { animation: spam-dialog-in 0.18s var(--ease); }
+  @keyframes spam-dialog-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}

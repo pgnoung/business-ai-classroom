@@ -1,0 +1,17 @@
+.readiness-page { padding-bottom: 28px; }
+.readiness-intro { display: grid; gap: 10px; }
+.readiness-intro .btn { width: fit-content; }
+.readiness-block { display: grid; gap: 12px; }
+.readiness-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.readiness-metric { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.readiness-metric dt { color: var(--ink-3); font-size: 12px; }
+.readiness-metric dd { margin: 3px 0 0; color: var(--ink); font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
+.readiness-metric small { display: block; margin-top: 3px; color: var(--ink-3); }
+.readiness-debt { padding: 11px; border: 1px solid color-mix(in srgb, var(--warm) 42%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--warm) 10%, var(--surface)); }
+.readiness-debt p { margin: 5px 0 0; }
+.readiness-code-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0 0; padding: 0; list-style: none; }
+.readiness-code-list li { padding: 3px 7px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; }
+.readiness-channel-list { display: grid; gap: 10px; }
+.readiness-channel { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.readiness-channel > strong { display: block; margin-bottom: 9px; }
+@media (max-width: 400px) { .readiness-grid { grid-template-columns: 1fr; } }

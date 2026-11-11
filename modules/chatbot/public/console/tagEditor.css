@@ -1,0 +1,41 @@
+/* tagEditor.css — แผงป้ายลูกค้าจัดกลุ่มตามมิติ (กรอบป้ายชุดเดียว 28 ก.ย. 2026)
+   ใช้ token ของธีมเท่านั้น (สว่าง/มืด มาจาก instance scope) · ชิปสีตามที่มาใช้คลาสเดิมใน console.css */
+
+.tag-groups { display: flex; flex-direction: column; gap: 10px; padding: 2px 14px 10px; }
+.tag-group { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tag-group + .tag-group { border-top: 1px dashed var(--line); padding-top: 9px; }
+.tag-group-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tag-group-name { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: 0.01em; }
+.tag-group-meta { font-size: 11.5px; color: var(--ink-3); }
+.tag-group .tag-chips { padding: 0; }
+.tag-group .tag-chip { max-width: 100%; }
+
+/* แถวเพิ่มป้าย: มิติเต็มบรรทัด แล้วค่า + ปุ่ม — แผงข้อมูลกว้างแค่ ~340px ทั้งเดสก์ท็อปและมือถือ
+   ถ้าสามช่องอยู่บรรทัดเดียว ชื่อมิติและตัวอย่างในช่องพิมพ์จะถูกตัดจนอ่านไม่ออก */
+.tag-add-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px; align-items: center; padding: 0 14px 4px;
+}
+.tag-add-grid > .tag-dim-select { grid-column: 1 / -1; }
+.tag-add-grid > .order-in { width: 100%; min-width: 0; }
+.tag-add-grid select.order-in { padding-right: 6px; text-overflow: ellipsis; }
+
+.tag-rules { margin: 6px 0 0; padding: 0 14px 6px; font-size: 11.5px; line-height: 1.55; color: var(--ink-3); }
+.tag-guide-link { color: var(--brand-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.tag-guide-link:hover { text-decoration: underline; }
+.tag-guide-link:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+.tag-del:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; opacity: 1; }
+
+/* หน้าตั้งค่า: คีย์เวิร์ด # → ป้ายลูกค้า (settingsHashtagTags.mjs) */
+.hashtag-tag-list { display: flex; flex-direction: column; gap: 10px; }
+.hashtag-tag-row { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.hashtag-tag-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.hashtag-tag-key { font-size: 14.5px; color: var(--ink); }
+.hashtag-tag-meta { font-size: 12px; color: var(--ink-3); }
+.hashtag-tag-edit { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) auto; gap: 6px; align-items: center; }
+.hashtag-tag-edit > .order-in { width: 100%; min-width: 0; }
+.hashtag-tag-edit > .order-in:disabled { opacity: 0.55; }
+@media (max-width: 480px) {
+  .hashtag-tag-edit { grid-template-columns: minmax(0, 1fr) auto; }
+  .hashtag-tag-edit > .hashtag-tag-dim { grid-column: 1 / -1; }
+}

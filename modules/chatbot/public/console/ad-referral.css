@@ -1,0 +1,178 @@
+/* ad-referral.css — แถบ "มาจากโฆษณา" ใต้หัวห้อง + ป้าย AD บนแถวรายการ (adReferral.mjs · พี่ง้วง 6 ต.ค. 2026 ค่ำ)
+   น้ำเงิน Meta เป็นสีเดียวที่ใช้กับ "เรื่องแอด Facebook" ทั้งคอนโซล — ตาจับได้ทันทีโดยไม่แย่งความหมายสีอื่น
+   (ม่วง = AI ปิดโดยคน · แดง = ระบบปิด · เหลือง = ไม่เข้าเกณฑ์ · เขียว = ลูกค้าใหม่) */
+:root {
+  --adref-meta: #0866ff;
+  --adref-meta-ink: #0753d6;
+  --adref-meta-deep: #0548b8;
+  --adref-glow: color-mix(in srgb, var(--adref-meta) 14%, transparent);
+}
+:root.theme-dark { --adref-meta-ink: #8fb6ff; --adref-glow: color-mix(in srgb, var(--adref-meta) 22%, transparent); }
+
+/* ---------------------------------- แถบในห้อง ---------------------------------- */
+
+.adref-banner {
+  position: relative; flex: none;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin: 10px 12px 2px;
+  padding: 12px 46px 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--adref-meta) 26%, var(--line));
+  background:
+    radial-gradient(140% 160% at 0% 0%, var(--adref-glow), transparent 58%),
+    linear-gradient(120deg, color-mix(in srgb, var(--brand) 7%, var(--surface)) 0%, var(--surface) 70%);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+/* แถบสีซ้าย: น้ำเงิน Meta ไหลเข้าสีแบรนด์ของ instance (ลูกแพร = กุหลาบ) */
+.adref-banner::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 5px;
+  background: linear-gradient(180deg, var(--adref-meta), var(--brand));
+}
+.adref-banner.is-entering { animation: adref-in 420ms var(--ease) both; }
+@keyframes adref-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+.adref-thumb {
+  position: relative; flex: none;
+  width: 56px; height: 56px; border-radius: 12px; overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: 0 0 0 2px var(--surface), 0 3px 10px rgba(8, 102, 255, 0.22);
+}
+.adref-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.adref-thumb.is-video::after {
+  content: "▶"; position: absolute; inset: 0; margin: auto;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 10px; padding-left: 2px;
+  background: rgba(10, 14, 28, 0.62); color: #fff;
+}
+.adref-thumb-fallback {
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--adref-meta) 0%, var(--brand) 100%);
+  color: #fff; font-weight: 800; font-size: 24px; letter-spacing: -0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.adref-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.adref-eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.adref-pill {
+  white-space: nowrap;
+  font-size: 11.5px; font-weight: 800; letter-spacing: 0.01em; color: #fff;
+  padding: 2px 9px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--adref-meta), color-mix(in srgb, var(--adref-meta) 55%, var(--brand)));
+  box-shadow: 0 2px 6px rgba(8, 102, 255, 0.28);
+}
+.adref-who { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.adref-who.is-new { background: var(--green-soft); color: var(--green); }
+.adref-who.is-back { background: var(--neutral-soft); color: var(--ink-2); }
+.adref-time { font-size: 12px; color: var(--ink-3); }
+
+.adref-title {
+  font-size: 15px; font-weight: 800; line-height: 1.35; color: var(--ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.adref-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 2px; }
+.adref-id {
+  font: 600 11.5px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--ink-2); background: var(--surface-2); border-radius: 6px; padding: 0 6px;
+  user-select: all; /* กดทีเดียวเลือกทั้งเลข ก๊อปไปค้นต่อได้ */
+}
+.adref-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.adref-link {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px;
+  border-radius: 999px; font-size: 12.5px; font-weight: 700; text-decoration: none; white-space: nowrap;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--line-2);
+  transition: border-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.adref-link:hover { border-color: var(--adref-meta); color: var(--adref-meta-ink); transform: translateY(-1px); }
+.adref-link:active { transform: translateY(0); }
+.adref-link-strong {
+  color: #fff; border-color: transparent;
+  background: linear-gradient(90deg, var(--adref-meta), var(--adref-meta-deep));
+  box-shadow: 0 2px 8px rgba(8, 102, 255, 0.3);
+}
+.adref-link-strong:hover { color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(8, 102, 255, 0.38); }
+.adref-link-quiet { min-height: 26px; padding: 0 9px; font-size: 11.5px; }
+
+.adref-others { margin-top: 4px; font-size: 12.5px; }
+.adref-others > summary {
+  cursor: pointer; color: var(--adref-meta-ink); font-weight: 700; width: fit-content;
+  list-style: none; padding: 2px 0;
+}
+.adref-others > summary::-webkit-details-marker { display: none; }
+.adref-others > summary::after { content: " ▾"; }
+.adref-others[open] > summary::after { content: " ▴"; }
+.adref-others ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.adref-others li {
+  display: flex; align-items: center; gap: 8px; padding: 5px 8px;
+  border-radius: 8px; background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+.adref-others-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.adref-others-time { color: var(--ink-3); font-size: 11.5px; white-space: nowrap; }
+.adref-others-more { color: var(--ink-3); background: none; }
+
+.adref-toggle {
+  position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border-radius: 50%; border: 0;
+  display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: var(--ink-3); font-size: 15px;
+}
+.adref-toggle:hover { background: var(--surface-2); color: var(--ink); }
+.adref-chevron { display: inline-block; transition: transform 200ms var(--ease); line-height: 1; transform: translateY(2px); }
+
+/* ย่อ: เหลือบรรทัดเดียว — ป้าย + ชื่อแอด (ยังรู้ว่ามาจากแอดไหน แต่ไม่กินพื้นที่แชทบนมือถือ) */
+.adref-banner.is-compact { align-items: center; padding: 7px 46px 7px 14px; }
+.adref-banner.is-compact .adref-thumb { width: 30px; height: 30px; border-radius: 8px; }
+.adref-banner.is-compact .adref-thumb-fallback { font-size: 14px; }
+.adref-banner.is-compact .adref-thumb.is-video::after { width: 16px; height: 16px; font-size: 7px; }
+.adref-banner.is-compact .adref-body { flex-direction: row; align-items: center; gap: 8px; }
+.adref-banner.is-compact .adref-eyebrow { flex: none; flex-wrap: nowrap; }
+.adref-banner.is-compact .adref-title { flex: 1; min-width: 0; }
+.adref-banner.is-compact :is(.adref-who, .adref-time, .adref-meta, .adref-others) { display: none; }
+.adref-banner.is-compact .adref-title {
+  font-size: 13.5px; -webkit-line-clamp: 1; display: block; white-space: nowrap; text-overflow: ellipsis;
+}
+.adref-banner.is-compact .adref-chevron { transform: rotate(180deg) translateY(1px); }
+
+@media (max-width: 640px) {
+  .adref-banner { margin: 8px 8px 2px; gap: 10px; padding: 10px 42px 10px 14px; }
+  .adref-thumb { width: 48px; height: 48px; }
+  .adref-title { font-size: 14px; }
+  .adref-actions { margin-left: 0; width: 100%; }
+  .adref-link { flex: 1; justify-content: center; }
+}
+@media (max-width: 720px) {
+  /* ปุ่ม ⚡ YOLO ลอยห้อยใต้หัวห้องที่มุมขวา (triage.css) — ไม่มีแถบคิวเมื่อไร แถบนี้ติดหัวห้องและโดนปุ่มนั้นทับ
+     เว้นมุมขวาบนให้ปุ่ม แล้วย้ายปุ่มย่อ/ขยายไปมุมขวาล่าง (โหมดย่อ: เลื่อนเข้ามาซ้ายของปุ่ม ⚡) */
+  .chat-pane:has(.yolo-btn) .chat-head + .adref-banner .adref-eyebrow { padding-right: 56px; }
+  .chat-pane:has(.yolo-btn) .chat-head + .adref-banner .adref-toggle { top: auto; bottom: 6px; }
+  .chat-pane:has(.yolo-btn) .chat-head + .adref-banner.is-compact { padding-right: 106px; }
+  .chat-pane:has(.yolo-btn) .chat-head + .adref-banner.is-compact .adref-eyebrow { padding-right: 0; }
+  .chat-pane:has(.yolo-btn) .chat-head + .adref-banner.is-compact .adref-toggle { right: 64px; bottom: auto; top: 6px; }
+}
+
+/* ------------------------------ ป้าย AD บนแถวรายการ ------------------------------ */
+
+.badge.badge-ad {
+  display: inline-flex; align-items: center; gap: 5px; max-width: 200px;
+  padding: 2px 9px 2px 3px;
+  color: var(--adref-meta-ink);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--adref-meta) 12%, var(--surface)),
+    color-mix(in srgb, var(--brand) 10%, var(--surface)));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--adref-meta) 30%, transparent);
+}
+.badge-ad-mark {
+  flex: none; font-size: 9.5px; font-weight: 900; letter-spacing: 0.04em; line-height: 1;
+  color: #fff; background: var(--adref-meta); border-radius: 999px; padding: 3px 5px;
+}
+.badge-ad-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .adref-banner.is-entering { animation: none; }
+  .adref-link, .adref-chevron { transition: none; }
+}

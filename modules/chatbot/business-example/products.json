@@ -1,0 +1,56 @@
+[
+  {
+    "id": "latte-hot",
+    "name": "ลาเต้ร้อน",
+    "price": 65,
+    "unit": "แก้ว",
+    "category": "กาแฟ",
+    "description": "ช็อตเอสเปรสโซคั่วกลาง นมสด ฟองนุ่ม",
+    "aliases": [
+      "ลาเต้",
+      "latte"
+    ],
+    "image": "images/latte.png",
+    "active": true
+  },
+  {
+    "id": "cocoa-iced",
+    "name": "โกโก้เย็น",
+    "price": 60,
+    "unit": "แก้ว",
+    "category": "ไม่ใช่กาแฟ",
+    "description": "โกโก้เข้มข้น หวานน้อยได้",
+    "aliases": [
+      "โกโก้",
+      "cocoa"
+    ],
+    "image": "images/cocoa.png",
+    "active": true
+  },
+  {
+    "id": "butter-croissant",
+    "name": "ครัวซองต์เนยสด",
+    "price": 55,
+    "unit": "ชิ้น",
+    "category": "เบเกอรี่",
+    "description": "อบสดทุกเช้า เนยฝรั่งเศส",
+    "aliases": [
+      "ครัวซองต์",
+      "croissant"
+    ],
+    "image": "images/croissant.png",
+    "active": true
+  },
+  {
+    "id": "custom-cake",
+    "name": "เค้กสั่งทำ",
+    "price": null,
+    "unit": "ปอนด์",
+    "category": "เบเกอรี่",
+    "description": "เค้กวันเกิดสั่งทำ ราคาตามแบบ ทีมงานประเมินให้",
+    "aliases": [
+      "เค้กวันเกิด"
+    ],
+    "active": true
+  }
+]

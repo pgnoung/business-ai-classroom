@@ -1,0 +1,580 @@
+/* workspace.css — chat workspace ของ console (แยกไฟล์จาก console.css คุมขนาด <800 บรรทัด)
+   ครอบ: convo pane (รายการแชท) + chat pane (ห้องแชท) + context pane (แผงข้อมูลลูกค้า)
+   token สี/จังหวะทั้งหมดมาจาก :root ใน console.css — โหลดคู่กันเสมอ (index.html)
+
+   BUGFIX 2026-08-10 (ห้องแชทไปกองใต้รายการแชทบนเดสก์ท็อป):
+   เดิมกฎ desktop `.chat-workspace { grid-template-columns: 360px 1fr }` อยู่ใน
+   console.css แต่ไฟล์นั้นโหลด "ก่อน" ไฟล์นี้ และ media query ไม่เพิ่ม specificity
+   -> กฎ base คอลัมน์เดียวด้านล่าง (specificity เท่ากัน, มาทีหลังใน cascade) ทับกฎ
+   desktop เสมอ เหลือรอดแค่ `.chat-workspace.ctx-open` (0,2,0 สูงกว่า) — split view
+   เลยแสดงถูกเฉพาะตอนแผงข้อมูลเปิด พอปิดแผง (หรืออยู่หน้า #/chat ที่ไม่มี ctx-open)
+   grid ยุบเป็นคอลัมน์เดียว รายการแชทอยู่บน ห้องแชทกองอยู่ล่าง
+   ทางแก้: กฎ responsive ของ workspace ทุกตัวย้ายมารวมไฟล์นี้ (ท้ายไฟล์) — ลำดับ
+   ในไฟล์เดียวกัน deterministic เสมอ; console.css ห้ามมี selector .chat-workspace
+   (มี regression test คุม: test/console-layout.test.mjs) */
+
+/* ------------------------------ chat workspace ------------------------------ */
+
+.chat-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
+
+/* -------- convo pane (รายการแชท) -------- */
+
+.convo-pane {
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
+  background: var(--surface);
+}
+.convo-head { padding: 10px 12px 6px; }
+.convo-search { position: relative; display: flex; align-items: center; }
+.convo-search-icon {
+  position: absolute; left: 12px; color: var(--ink-3); font-size: 17px; pointer-events: none;
+}
+.convo-search-input {
+  width: 100%; min-height: 40px; border: 1px solid transparent; border-radius: 999px;
+  background: var(--bg); padding: 8px 38px 8px 36px; font-size: 16px;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.convo-search-input::placeholder { color: var(--ink-3); }
+.convo-search-input:hover { background: var(--surface-2); }
+.convo-search-input:focus {
+  outline: none; background: var(--surface); border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+.convo-search-clear {
+  position: absolute; right: 6px; width: 30px; height: 30px; border: none; border-radius: 50%;
+  background: transparent; color: var(--ink-3); font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.convo-search-clear:hover { background: var(--line); color: var(--ink); }
+
+.inbox-filters {
+  display: flex; gap: 6px; padding: 6px 12px 8px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.inbox-filters::-webkit-scrollbar { display: none; }
+.fchip {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+  min-height: 34px; padding: 5px 12px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  font-size: 13px; font-weight: 600; color: var(--ink-2); text-decoration: none;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.fchip:hover { border-color: var(--line-2); color: var(--ink); }
+.fchip-count {
+  font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 1px 7px; min-width: 20px;
+  text-align: center; background: color-mix(in srgb, var(--ink) 8%, transparent); color: inherit;
+}
+.fchip.is-active { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.fchip-hot.is-active { background: var(--hot-ink); border-color: var(--hot-ink); }
+.fchip-warm.is-active { background: var(--warm-ink); border-color: var(--warm-ink); }
+.fchip-cold.is-active { background: var(--cold-ink); border-color: var(--cold-ink); }
+.fchip-needs.is-active { background: var(--red); border-color: var(--red); }
+.fchip-aioff.is-active { background: var(--ink-3); border-color: var(--ink-3); }
+.fchip.is-active .fchip-count { background: rgba(255, 255, 255, 0.24); }
+/* W3: chip เลือกสาขา (ปุ่มจริง ไม่ใช่ลิงก์ hash) — active เป็นกุหลาบแบรนด์ */
+.fchip-branch { cursor: pointer; font-family: inherit; }
+.fchip-branch.is-active { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.branch-filters { padding-bottom: 2px; }
+.filter-explain {
+  margin: 0; padding: 0 14px 8px; font-size: 12px; color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.convo-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.convo-row {
+  display: flex; gap: 11px; align-items: center;
+  min-height: 68px; padding: 10px 12px;
+  text-decoration: none; color: inherit;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 0.12s var(--ease);
+}
+.convo-row:hover { background: var(--surface-2); }
+.convo-row:active { background: var(--brand-50); }
+.convo-row.is-active { background: var(--brand-50); }
+.convo-row.is-active:hover { background: var(--brand-100); }
+.convo-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.convo-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.convo-name { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.convo-time { color: var(--ink-3); font-size: 12px; flex-shrink: 0; }
+.convo-bottom { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.preview {
+  flex: 1; color: var(--ink-3); font-size: 13px; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.convo-row.is-unread .convo-name { font-weight: 800; }
+.convo-row.is-unread .preview { color: var(--ink); font-weight: 600; }
+.unread-dot {
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--brand);
+}
+.convo-more { margin: 10px 12px 14px; width: calc(100% - 24px); }
+
+.badge {
+  flex-shrink: 0; font-size: 11.5px; font-weight: 700;
+  border-radius: 999px; padding: 2px 8px; white-space: nowrap;
+}
+.badge-red { background: var(--danger-soft); color: var(--danger); }
+.badge-gray { background: var(--neutral-soft); color: var(--ink-2); }
+.badge-orange { background: var(--orange-soft); color: var(--orange); }
+
+/* -------- chat pane (ห้องแชท) -------- */
+
+.chat-pane {
+  position: relative; display: flex; flex-direction: column; min-height: 0; min-width: 0;
+  background: var(--bg);
+}
+.chat-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 9px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  /* 12 ต.ค. 2026 (พี่ง้วง iPhone iOS 27.2 เปิดแบบแอปหน้าจอหลัก): ชื่อลูกค้าบรรทัดแรกอยู่ชิดขอบ safe area พอดี
+     iOS รุ่นใหม่เบลอแถบใต้แถบสถานะเลยเลยเข้ามาทับชื่อ = เว้นเพิ่ม 10px ใต้ safe area (เดสก์ท็อป env=0 แทบไม่เปลี่ยน) */
+  padding: max(8px, calc(env(safe-area-inset-top) + 10px)) 12px 8px; min-height: 56px;
+}
+.chat-back { font-size: 26px; }
+.chat-head-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.chat-head-name { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* แถวย่อยใต้ชื่อ: ข้อความยุบได้ ป้ายห้ามยุบ — ellipsis ต้องกินเฉพาะ .chat-head-sub-text */
+.chat-head-sub { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; min-width: 0; }
+.chat-head-sub-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.chat-head-sub > .badge { flex: none; }
+
+.bubbles {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: 14px 14px 10px; display: flex; flex-direction: column; gap: 8px;
+}
+.day-sep { display: flex; align-items: center; gap: 12px; margin: 8px 0 2px; }
+.day-sep::before, .day-sep::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.day-sep span {
+  font-size: 11.5px; font-weight: 700; color: var(--ink-2);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px;
+}
+.chat-older { align-self: center; margin-bottom: 4px; }
+/* 28 ก.ย. 2026: ป้ายวันเกาะหัวแชทขณะเลื่อน (แบบ LINE) — เส้นข้างซ่อน เหลือเม็ดวันที่กลางจอ ไม่บังฟอง */
+.bubbles .day-sep.is-sticky { position: sticky; top: 0; z-index: 2; pointer-events: none; }
+.bubbles .day-sep.is-sticky::before, .bubbles .day-sep.is-sticky::after { visibility: hidden; }
+.bubbles .day-sep.is-sticky span { box-shadow: 0 2px 6px -3px rgba(0, 0, 0, 0.25); }
+
+.bubble-row { display: flex; width: 100%; min-width: 0; }
+.bubble-row.from-them { justify-content: flex-start; }
+.bubble-row.from-us { justify-content: flex-end; }
+.bubble-stack { display: flex; flex-direction: column; gap: 4px; width: fit-content; max-width: min(82%, 560px); min-width: 0; }
+.from-them .bubble-stack { align-items: flex-start; }
+.from-us .bubble-stack { align-items: flex-end; }
+.bubble {
+  max-width: 100%; border-radius: 16px; padding: 9px 13px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+}
+.from-them .bubble { border-bottom-left-radius: 6px; }
+.from-us .bubble { border-bottom-right-radius: 6px; }
+.bubble p { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.bubble-meta { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-3); text-align: right; }
+.bubble-evidence { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; width: 100%; min-width: 0; }
+.bubble-evidence-chip {
+  display: inline-flex; align-items: center; min-height: 20px; padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent); border-radius: 999px;
+  color: var(--ink-3); background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+  max-width: 100%; overflow-wrap: anywhere; text-align: right;
+  font-size: 10.5px; font-weight: 700; line-height: 1.25;
+}
+.bubble-evidence-chip.evidence-accepted { color: var(--green); border-color: color-mix(in srgb, var(--green) 34%, transparent); }
+.bubble-evidence-chip.evidence-interaction { color: var(--brand-700); border-color: color-mix(in srgb, var(--brand) 38%, transparent); }
+.bubble-evidence-chip.evidence-partial,
+.bubble-evidence-chip.evidence-ambiguous { color: var(--warm-ink); border-color: color-mix(in srgb, var(--warm) 40%, transparent); }
+.bubble-evidence-chip.evidence-rejected { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+/* B7d: สีฟองตามคนส่งจริง — AI = ฟ้าแบรนด์, แอดมิน AI เปิด = เขียว, แอดมิน AI ปิด = ส้ม
+   (bubble-meta ระบุชื่อคนส่งเสมอ — สีคือชั้นอ่านไว ไม่ใช่ที่พึ่งเดียว) */
+.from-us .bubble.mode-ai { background: var(--bubble-ai, var(--brand-50)); border-color: var(--brand-100); }
+.from-us .bubble.mode-op-on { background: var(--green-soft); border-color: var(--green-line); }
+.from-us .bubble.mode-op-off { background: var(--opoff-soft); border-color: var(--opoff-line); }
+
+.jump-latest {
+  position: absolute; right: 16px; bottom: 96px; z-index: var(--z-jump);
+  border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 14px;
+  background: var(--surface); color: var(--brand-700); font-weight: 700; font-size: 13px;
+  font-family: inherit; cursor: pointer; box-shadow: var(--shadow-2);
+  opacity: 0; pointer-events: none; transform: translateY(6px);
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.chat-pane.is-scrolled-up .jump-latest { opacity: 1; pointer-events: auto; transform: translateY(0); }
+/* v1.4.33b: ตอนกางร่างอ่านอยู่ ให้ซ่อนปุ่ม "↓ ล่าสุด" ไปเลย
+   เหตุ (เห็นจริงบนจอ 375px): ปุ่มลอยมุมขวาล่างไปทับปุ่ม "ย่อเก็บ" พอดี — กดผิดง่ายมาก
+   บนมือถือ และผิดแล้วจอกระโดดไปล่างสุดโดยไม่ตั้งใจ
+   เลือกซ่อนแทนการเลื่อนหนี เพราะขยับไปตรงไหนก็ยังลอยทับตัวหนังสือของร่างอยู่ดี
+   และช่วงที่กำลังอ่านร่างก็ไม่ได้ใช้ปุ่มนี้ — ย่อเก็บเมื่อไหร่มันกลับมาเอง */
+.chat-pane:has(.draft-card:not(.is-collapsed)) .jump-latest {
+  opacity: 0; pointer-events: none;
+}
+.jump-latest:hover { border-color: var(--brand); }
+
+.reply-bar {
+  flex-shrink: 0; background: var(--surface); border-top: 1px solid var(--line);
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+}
+.reply-line { display: flex; gap: 8px; align-items: flex-end; }
+.reply-input {
+  flex: 1; resize: none; border: 1px solid var(--line-2); border-radius: 14px;
+  padding: 11px 14px; font-size: 16px; min-height: var(--tap);
+  max-height: 120px; background: var(--surface-2);
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.reply-input:focus { outline: none; border-color: var(--brand); background: var(--surface); box-shadow: 0 0 0 3px var(--brand-100); }
+.btn-send { flex-shrink: 0; padding: 10px 22px; border-radius: 14px; }
+
+.draft-card {
+  border: 1.5px dashed var(--red); border-radius: 12px; background: var(--red-soft);
+  padding: 8px 12px; margin-bottom: 10px;
+}
+/* v1.4.12c: พับเก็บเป็นค่าเริ่มต้น — ร่างยาวเคยกินทั้งจอเหมือน error ค้าง */
+.draft-toggle {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  padding: 2px 0; cursor: pointer; font: inherit; color: inherit;
+}
+.draft-label { display: block; margin: 0 0 2px; font-size: 12px; font-weight: 700; color: var(--red); }
+.draft-preview {
+  display: block; font-size: 12.5px; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.draft-text {
+  margin: 8px 0; font-size: 14px; white-space: pre-wrap; word-break: break-word;
+  max-height: 240px; overflow-y: auto;
+}
+.draft-card.is-collapsed .draft-text,
+.draft-card.is-collapsed .draft-use-btn { display: none; }
+.draft-card:not(.is-collapsed) .draft-preview { display: none; }
+
+/* v1.4.13: แนบรูปในช่องแชท — ปุ่ม 📎, chip รูปรอส่ง, รูปในฟองแชท */
+.btn-attach { flex-shrink: 0; padding: 10px 12px; border-radius: 14px; font-size: 17px; line-height: 1; }
+.attach-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.attach-chips.is-empty { display: none; }
+.attach-chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 220px;
+  border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface-2);
+  padding: 3px 6px 3px 3px; font-size: 12.5px;
+}
+.attach-thumb { width: 26px; height: 26px; border-radius: 999px; object-fit: cover; flex-shrink: 0; }
+.attach-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.attach-remove {
+  border: none; background: none; cursor: pointer; font-size: 12px;
+  color: var(--ink-2); padding: 2px 4px; flex-shrink: 0;
+}
+.bubble-img { display: block; max-width: min(240px, 100%); border-radius: 10px; }
+.attach-file-icon {
+  width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--red-soft); color: var(--red); font-size: 8px; font-weight: 900; flex-shrink: 0;
+}
+.reply-file-note { margin: 0 0 7px; font-size: 11px; color: var(--ink-3); }
+.sticker-chip {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 0 8px; padding: 3px 6px 3px 3px;
+  border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface-2); font-size: 12.5px;
+}
+.sticker-symbol { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--brand-50); font-size: 18px; }
+.sticker-picker {
+  display: grid; grid-template-columns: repeat(6, minmax(40px, 1fr)); gap: 6px; max-height: 190px;
+  overflow-y: auto; padding: 8px; margin: 0 0 8px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface-2);
+}
+.sticker-option { min-height: 44px; padding: 3px; border: 1px solid transparent; border-radius: 9px; background: var(--surface); cursor: pointer; }
+.sticker-option:hover, .sticker-option:focus-visible { outline: none; border-color: var(--brand); background: var(--brand-50); }
+.sticker-option { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.sticker-option-symbol { font-size: 23px; line-height: 1; }
+/* audit 2026-08-26: .sticker-picker ตั้ง display:grid ไว้ ซึ่งชนะ attribute hidden
+   ผลคือเปิดแผงสติกเกอร์แล้วปิดไม่ได้เลย ต้องประกาศ [hidden] ให้ชนะกลับ
+   (กฎเดียวกันนี้ใช้กับทุกกล่องที่ถูกซ่อนด้วย hidden แล้วมี display ของตัวเอง) */
+.sticker-picker[hidden] { display: none; }
+/* 28 ก.ย. 2026: ป้ายสติกเกอร์ที่เลือกก็โดนแบบเดียวกัน (inline-flex ชนะ hidden) — ยังไม่เลือกสติกเกอร์
+   ก็มีเม็ดว่าง ๆ ค้างเหนือช่องพิมพ์ทุกห้อง */
+.sticker-chip[hidden] { display: none; }
+.sticker-option-img { width: 42px; height: 42px; object-fit: contain; }
+.sticker-choice-img { width: 34px; height: 34px; object-fit: contain; }
+.sticker-option small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); font-size: 9px; }
+.sticker-empty { grid-column: 1 / -1; margin: 4px; color: var(--ink-2); font-size: 12px; }
+.media-image-link { display: block; line-height: 0; }
+.media-image { max-height: 360px; object-fit: contain; background: var(--surface-2); }
+.media-file-card {
+  display: flex; align-items: center; gap: 9px; min-width: 220px; max-width: 100%; padding: 9px;
+  color: inherit; text-decoration: none; border: 1px solid var(--line-2); border-radius: 11px; background: var(--surface-2);
+}
+.media-file-card:hover { border-color: var(--brand); background: var(--brand-50); }
+.media-file-icon { flex: 0 0 34px; display: inline-flex; align-items: center; justify-content: center; height: 34px; border-radius: 8px; background: var(--red-soft); color: var(--red); font-size: 9px; font-weight: 900; }
+.media-file-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.media-file-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.media-file-main small { color: var(--ink-3); font-size: 11px; }
+.media-playable { width: min(320px, 100%); }
+.media-playable-head { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+.media-player { display: block; width: 100%; max-width: 100%; border-radius: 10px; background: #101318; }
+.media-video { max-height: 280px; }
+.media-download-link { display: inline-block; margin-top: 5px; color: var(--brand-700); font-size: 12px; font-weight: 700; }
+.message-sticker { display: inline-flex; align-items: center; gap: 9px; min-width: 170px; max-width: 100%; padding: 9px 11px; border: 1px solid var(--line-2); border-radius: 14px; background: var(--surface-2); }
+.message-sticker-symbol { flex: 0 0 46px; width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--brand-50); font-size: 28px; }
+.message-sticker-img { flex: 0 0 76px; width: 76px; height: 76px; object-fit: contain; }
+.message-sticker-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.message-sticker-copy strong { font-size: 13px; }
+.message-sticker-copy small { color: var(--ink-3); font-size: 10px; }
+.media-unavailable { max-width: 290px; padding: 7px 9px; border: 1px dashed var(--line-2); border-radius: 9px; color: var(--ink-2); font-size: 12px; }
+.line-emoji-token { display: inline-block; padding: 0 0.2em; border: 1px solid var(--line-2); border-radius: 0.45em; background: var(--brand-50); font-size: 0.92em; vertical-align: 0.02em; }
+.line-emoji { display: inline-flex; vertical-align: -0.22em; }
+.line-emoji-img { width: 1.35em; height: 1.35em; object-fit: contain; }
+
+.composer-count { flex: 0 0 auto; color: var(--ink-3); font-size: 10px; font-variant-numeric: tabular-nums; }
+.composer-count.is-over { color: var(--danger); font-weight: 700; }
+.chat-pane { position: relative; }
+.chat-drop-overlay {
+  position: absolute; inset: 64px 14px 92px; z-index: 12; border: 2px dashed var(--brand);
+  border-radius: 18px; background: color-mix(in srgb, var(--brand-50) 92%, transparent);
+  color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; text-align: center; pointer-events: none;
+}
+.chat-drop-overlay[hidden] { display: none; }
+.chat-drop-overlay span { color: var(--ink-2); font-size: 12px; }
+.legacy-readonly-banner,
+.legacy-history-strip { margin: 8px 12px 0; border: 1px solid var(--line-2); border-radius: 12px; padding: 9px 12px; }
+.legacy-readonly-banner { display: flex; flex-direction: column; gap: 2px; background: var(--surface-2); color: var(--ink); }
+.legacy-readonly-banner span { color: var(--ink-2); font-size: 11px; }
+.legacy-history-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; background: var(--brand-50); }
+.legacy-history-link { color: var(--brand-ink); font-size: 11px; font-weight: 600; text-decoration: none; }
+.legacy-history-link:hover { text-decoration: underline; }
+.legacy-note-form { display: flex; flex: 1 1 260px; gap: 6px; min-width: 0; }
+.legacy-note-input { flex: 1; min-width: 0; border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 8px; background: var(--surface); color: var(--ink); font: inherit; font-size: 11px; }
+.badge-owner { color: var(--brand-ink); background: var(--brand-50); }
+.owner-edit { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 10px; }
+.owner-edit label { color: var(--ink-2); font-size: 11px; }
+.owner-select { min-width: 0; border: 1px solid var(--line-2); border-radius: 9px; padding: 7px 9px; background: var(--surface); color: var(--ink); }
+.bubble-copy { align-self: flex-end; border: 0; background: transparent; color: var(--ink-3); font-size: 9px; cursor: pointer; opacity: 0; transition: opacity .15s ease; }
+.bubble-stack:hover .bubble-copy, .bubble-copy:focus-visible { opacity: 1; }
+@media (hover: none) { .bubble-copy { opacity: 1; } }
+.note-row.is-pinned { border-color: var(--brand); background: var(--brand-50); }
+.note-pin { color: var(--brand-ink); }
+.bubble-empty { color: var(--ink-3); font-size: 12px; }
+.badge-fu-off { opacity: 0.75; }
+/* คิวรอคน: ตัวเลขเวลารอต้องไม่ขยับซ้าย-ขวาตอนรีเฟรช และเส้นเงินต้องเด่นกว่าป้ายอื่น */
+.badge-wait { font-variant-numeric: tabular-nums; }
+.badge-money { font-weight: 700; }
+
+.pause-banner {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 8px 14px; background: var(--warm-soft); border-bottom: 1px solid var(--orange-line);
+  color: var(--warm-ink); font-size: 13.5px; font-weight: 600;
+}
+.btn-resume { background: var(--brand); color: var(--on-brand); border: none; box-shadow: var(--shadow-1); }
+.btn-resume:hover { background: var(--brand-600); }
+:root.theme-pngoung.theme-dark .fchip.is-active,
+:root.theme-pngoung.theme-dark .fchip-branch.is-active,
+:root.theme-pngoung.theme-dark .btn-resume { color: var(--on-brand); }
+:root.theme-pngoung .convo-search-input:hover { background: var(--surface-2); }
+:root.theme-pngoung.theme-dark .badge-gray { background: var(--neutral-soft); }
+
+/* empty state ช่องกลาง (เดสก์ท็อปยังไม่เลือกห้อง) */
+.chat-empty { align-items: center; justify-content: center; display: none; }
+.chat-empty-box { text-align: center; max-width: 300px; padding: 24px; }
+.chat-empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+.chat-empty-title { margin: 0 0 6px; font-weight: 800; font-size: 16px; }
+.chat-empty-sub { margin: 0; color: var(--ink-2); font-size: 13.5px; }
+
+/* -------- context pane (แผงข้อมูลลูกค้า) -------- */
+
+.context-pane {
+  display: flex; flex-direction: column; min-height: 0;
+  background: var(--surface); border-left: 1px solid var(--line);
+}
+.ctx-head {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 14.5px;
+}
+.ctx-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.ctx-card { padding: 14px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.ctx-id { display: flex; align-items: center; gap: 11px; }
+.ctx-id-main { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ctx-name { font-size: 16px; font-weight: 800; word-break: break-word; }
+.ctx-sub { font-size: 12px; color: var(--ink-3); }
+.ctx-score-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.name-edit { display: flex; align-items: center; gap: 6px; }
+.name-edit label { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+
+.score-badge {
+  flex-shrink: 0; font-size: 12px; font-weight: 800;
+  border-radius: 999px; padding: 2px 9px; min-width: 26px; text-align: center;
+}
+.score-low { background: var(--neutral-soft); color: var(--ink-2); }
+.score-mid { background: var(--warm-soft); color: var(--warm-ink); }
+.score-high { background: var(--green-soft); color: var(--green); }
+.score-none { background: var(--neutral-soft); color: var(--ink-2); font-weight: 600; }
+.trend { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-flat { color: var(--ink-2); }
+.cost-chip {
+  flex-shrink: 0; font-size: 12px; font-weight: 700;
+  border-radius: 999px; padding: 2px 9px; background: var(--warm-soft); color: var(--warm-ink);
+}
+
+/* panel พับได้ใน context pane */
+.panel { border-bottom: 1px solid var(--line); background: var(--surface); }
+.panel summary {
+  padding: 12px 14px; font-weight: 700; font-size: 13.5px; color: var(--ink);
+  cursor: pointer; min-height: var(--tap); display: flex; align-items: center; gap: 6px;
+  list-style: none; transition: background-color 0.12s var(--ease);
+}
+.panel summary::-webkit-details-marker { display: none; }
+.panel summary::before {
+  content: "›"; color: var(--ink-3); font-size: 16px; font-weight: 700;
+  transition: transform 0.15s var(--ease); transform: rotate(0deg); width: 14px;
+}
+.panel[open] summary::before { transform: rotate(90deg); }
+.panel summary:hover { background: var(--surface-2); }
+.sales-panel summary { color: var(--brand-700); }
+.notes-panel summary { color: var(--purple); }
+.panel-text { margin: 0; padding: 0 14px 10px; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+.legacy-candidate-link { flex: 1; min-width: 0; }
+.panel-sub { margin: 0; padding: 0 14px 12px; font-size: 12px; color: var(--ink-2); }
+.panel-warn {
+  margin: 0 14px 10px; padding: 8px 10px; border-radius: 10px;
+  background: var(--warm-soft); color: var(--warm-ink); font-size: 13px; font-weight: 600;
+}
+.panel-row { display: flex; align-items: center; gap: 8px; padding: 0 14px 10px; flex-wrap: wrap; }
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }
+.chip {
+  font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px;
+  background: var(--brand-50); color: var(--brand-700);
+}
+.chip-signal { background: var(--green-soft); color: var(--green); font-weight: 600; }
+.chip-explain { margin: 0; padding: 0 14px 6px; font-size: 12px; color: var(--ink-2); }
+.panel-question {
+  background: var(--brand-100); border-radius: 8px; flex: 1;
+  padding: 8px 10px; font-weight: 700; color: var(--brand-700);
+}
+.opportunity-layer {
+  margin: 4px 14px 14px; padding: 12px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--surface-2);
+}
+.opportunity-title { margin: 0 0 4px; color: var(--purple); font-size: 12px; font-weight: 800; letter-spacing: .02em; }
+.opportunity-note, .opportunity-empty { margin: 0 0 10px; color: var(--ink-2); font-size: 12px; line-height: 1.45; }
+.opportunity-row, .opportunity-slots { display: flex; gap: 8px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line); }
+.opportunity-slots { display: block; }
+.opportunity-key { color: var(--ink-2); font-size: 11px; font-weight: 700; flex: 0 0 126px; }
+.opportunity-value { color: var(--ink); font-size: 12px; font-weight: 700; word-break: break-word; }
+.opportunity-slot-list { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 1.2fr); gap: 4px 8px; margin: 6px 0 0; font-size: 12px; }
+.opportunity-slot-list dt { color: var(--ink-2); }
+.opportunity-slot-list dd { margin: 0; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+.opportunity-chips { padding: 6px 0 0; }
+.opportunity-missing, .opportunity-pending { background: var(--warm-soft); color: var(--warm-ink); }
+.opportunity-ready { background: var(--green-soft); color: var(--green); }
+.opportunity-status { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+
+.fu-list { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 10px; }
+.fu-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface-2);
+}
+.fu-when-label { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.fu-note-label { font-size: 13px; color: var(--ink-2); flex: 1; min-width: 80px; word-break: break-word; }
+.danger-zone {
+  display: flex; justify-content: flex-end;
+  padding: 4px 14px 12px; border-top: 1px dashed var(--line); margin-top: 4px;
+}
+.note-list { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 10px; }
+.note-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface-2);
+}
+.note-row.is-auto { background: var(--brand-50); border-color: var(--brand-100); }
+.note-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.note-meta { font-size: 11px; color: var(--ink-2); }
+.note-text { font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+
+.handoff summary { color: var(--warm-ink); }
+.handoff-text {
+  margin: 0; padding: 0 14px 12px; font-family: inherit; font-size: 12.5px;
+  color: var(--ink-2); white-space: pre-wrap; word-break: break-word; max-height: 180px; overflow-y: auto;
+}
+
+/* --------------------------- responsive (workspace) --------------------------
+   กฎ responsive ของ chat workspace ทั้งหมดอยู่ "ท้ายไฟล์นี้" โดยเจตนา — ต้องมา
+   หลังกฎ base ด้านบนในไฟล์เดียวกัน (cascade ในไฟล์เดียว deterministic เสมอ)
+   ห้ามย้ายไป console.css เด็ดขาด: ไฟล์นั้นโหลดก่อน จะแพ้กฎ base ที่ specificity
+   เท่ากัน แล้วบั๊ก "ห้องแชทกองใต้รายการแชท" จะกลับมา (ดูคอมเมนต์หัวไฟล์) */
+
+/* มือถือ (<1024): ทีละหน้า — ห้องแชทเต็มจอ, แผงข้อมูลเป็นแผ่นเลื่อนจากขวา */
+@media (max-width: 1023.98px) {
+  #app[data-view="room"] .convo-pane { display: none; }
+  #app[data-view="list"] .chat-pane, #app[data-view="list"] .context-pane { display: none; }
+  #app[data-view="list"] .convo-list { padding-bottom: var(--tabbar-h); }
+
+  .context-pane {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: var(--z-sheet);
+    width: min(92vw, 380px); box-shadow: var(--shadow-sheet);
+    transform: translateX(105%); transition: transform 0.24s var(--ease);
+    /* เคสจริง 2026-08-27 (ชมพู่ติดค้างบนมือถือ): แผงนี้เป็นที่เดียวในเว็บที่ลืมเผื่อ
+       safe area ของ iPhone — ทุกที่อื่น (topbar/tabbar/chat-head/reply-bar) เผื่อไว้หมด
+       พอ top:0 ชนรอยบาก ปุ่ม ✕ ที่อยู่บนสุดของแผงเลยไปอยู่ใต้แถบสถานะ กดไม่โดน
+       และแผงไม่มีทางออกทางอื่นเลย (ไม่มี backdrop ไม่มี Esc ไม่มีปัดปิด) = ค้างจริง */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .chat-workspace.ctx-open .context-pane { transform: translateX(0); }
+
+  /* ทางออกที่สอง: แตะนอกแผงเพื่อปิด — กันเคสที่ปุ่ม ✕ กดไม่โดนด้วยเหตุอื่น
+     (จอเล็กผิดปกติ, คีย์บอร์ดบัง, เบราว์เซอร์แปลก ๆ) ผู้ใช้ต้องมีทางออกเสมอ */
+  .ctx-backdrop {
+    position: fixed; inset: 0; z-index: calc(var(--z-sheet) - 1);
+    background: rgba(3, 8, 21, 0.38);
+    opacity: 0; pointer-events: none; transition: opacity 0.24s var(--ease);
+  }
+  .chat-workspace.ctx-open .ctx-backdrop { opacity: 1; pointer-events: auto; }
+}
+
+/* เดสก์ท็อปไม่ต้องมี backdrop — แผงข้อมูลเป็นคอลัมน์หนึ่งของ layout ไม่ได้ทับอะไร */
+@media (min-width: 1024px) {
+  .ctx-backdrop { display: none; }
+}
+
+/* เดสก์ท็อป (>=1024): split view [รายการ 360px | ห้องแชท | ข้อมูล 340px]
+   ใช้ได้ทั้งตอนแผงข้อมูลเปิด (3 คอลัมน์) และปิด (2 คอลัมน์) — ทั้งเข้าจากการคลิก
+   รายการและ deep link #/c/<id> ตรง ๆ */
+@media (min-width: 1024px) {
+  .chat-workspace { grid-template-columns: 360px minmax(0, 1fr); }
+  .chat-workspace.ctx-open { grid-template-columns: 360px minmax(0, 1fr) 340px; }
+  .chat-workspace:not(.ctx-open) .context-pane { display: none; }
+  .convo-pane { border-right: 1px solid var(--line); }
+  .chat-back { display: none; }
+  .ctx-close { display: none; }
+  .chat-empty { display: flex; }
+  .chat-head { padding: 8px 16px; }
+  .bubbles { padding: 18px 22px 12px; }
+  .reply-bar { padding: 12px 16px; }
+}
+
+/* จอกลาง 1024-1279: แผงข้อมูลแคบลงนิด กัน chat pane แคบเกิน */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .chat-workspace { grid-template-columns: 320px minmax(0, 1fr); }
+  .chat-workspace.ctx-open { grid-template-columns: 320px minmax(0, 1fr) 312px; }
+}
+
+/* Backup is an evidence-only view. Decrypt/restore controls intentionally do
+   not exist in the web process, which never holds the age private identity. */
+.backup-page { display: grid; gap: 18px; max-width: 980px; }
+.backup-hero { display: flex; justify-content: space-between; gap: 24px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.backup-hero.is-ok { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); }
+.backup-hero.is-warn, .backup-hero.is-missing { border-color: color-mix(in srgb, var(--orange) 55%, var(--line)); }
+.backup-eyebrow { color: var(--ink-2); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.backup-hero h2, .backup-detail-card h2 { margin: 6px 0; }
+.backup-hero p, .backup-detail-card p { margin: 0; color: var(--ink-2); }
+.backup-last { display: grid; justify-items: end; align-content: center; min-width: 180px; }
+.backup-last span, .backup-last small { color: var(--ink-2); }
+.backup-last strong { font-size: 24px; }
+.backup-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.backup-policy-card, .backup-detail-card { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.backup-policy-card { display: grid; gap: 4px; text-align: center; }
+.backup-policy-card strong { font-size: 26px; color: var(--brand); }
+.backup-policy-card span, .backup-note { color: var(--ink-2); }
+.backup-list { margin: 10px 0 0; padding-inline-start: 20px; display: grid; gap: 8px; }
+@media (max-width: 720px) {
+  .backup-hero { display: grid; }
+  .backup-last { justify-items: start; }
+  .backup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.legacy-sep span { background: var(--brand-50); color: var(--brand-ink); border: 1px dashed var(--line-2); font-weight: 600; }
+
+/* ฟอร์มเพิ่มรอบเรียน (2026-08-26) — กรอกเองจาก Console แทนการแก้ไฟล์ใน release */
+.round-add { margin: 0 0 14px; }
+.round-add-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.round-add-row input { padding: 7px 10px; border: 1px solid var(--line-2); border-radius: 9px; background: var(--surface); font: inherit; }
+.round-add-row input[type="text"] { flex: 1 1 260px; min-width: 200px; }
+.round-add-row input[type="number"] { width: 190px; }
+.seat-actions { display: flex; gap: 6px; align-items: center; white-space: nowrap; }

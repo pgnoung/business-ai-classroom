@@ -1,0 +1,22 @@
+{
+  "baseSourceCommit": "4316f979e75b9197b7bba1b4ac6d6c5618a6831b",
+  "baseReleaseId": "sha256:19ac04e594a51921387cfb7ae54c87c2fdaf9e349769163787c681ae7f3e4c9b",
+  "observedDate": "2026-11-11",
+  "baseChassisFilesVerified": 535,
+  "baseParity": "all matched running release SHA256 before modifications",
+  "adaptations": [
+    "generic business profile",
+    "business importer",
+    "student setup and VPS launcher",
+    "public fixture sanitization",
+    "one-question instructor"
+  ],
+  "excludedData": [
+    "production brain",
+    "instance",
+    "credentials",
+    "database",
+    "customer messages",
+    "private business seed"
+  ]
+}

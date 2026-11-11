@@ -1,0 +1,170 @@
+/* yolo.css — ปุ่ม ⚡ YOLO ในหัวห้องแชท + กล่องสั่ง + บล็อก "Telegram สั่งงานลูกแพร" (2026-09-28)
+   ใช้ token ของธีมเท่านั้น (ไม่มีสีตายตัว) — ธีมสว่าง/มืดของ instance จึงถูกต้องเองทั้งสองโหมด
+   ช่องกรอกทุกช่องตั้งสีตัวอักษร+พื้นเอง: บทเรียนธีมมืด (UA ใส่พื้นขาว = ขาวบนขาว contrast 1.0)
+   CSP style-src 'self': หน้าตาทั้งหมดอยู่ที่นี่ ห้าม inline style ในไฟล์ .mjs */
+
+/* ---------------------------- ปุ่มในหัวห้อง ---------------------------- */
+.yolo-anchor { position: relative; flex-shrink: 0; display: inline-flex; }
+.yolo-btn {
+  min-height: 38px; border: none; border-radius: 999px; padding: 6px 12px;
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap;
+  font-family: inherit; font-size: 13.5px; font-weight: 800; letter-spacing: 0.01em;
+  background: var(--brand-50); color: var(--brand-700);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--brand) 55%, transparent);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.yolo-btn:hover { background: var(--brand-100); }
+.yolo-btn:active, .yolo-btn.is-active { background: var(--brand); color: var(--on-brand); box-shadow: var(--shadow-1); }
+.yolo-bolt { display: inline-block; font-size: 15px; line-height: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .yolo-bolt { transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
+  .yolo-btn:hover .yolo-bolt { transform: rotate(-12deg) scale(1.15); }
+}
+/* จอแคบ (วัดจริง 390px): หัวห้องแน่นจนชื่อลูกค้าเหลือ 16px อยู่แล้วก่อนมีปุ่มนี้ — ถ้าเบียดเข้าไปอีก
+   ชื่อหายหมดและ "เสร็จสิ้น" ตกบรรทัด จึงถอดปุ่มออกจากแถวหัวห้อง (display: contents = ไม่กินที่)
+   แล้วลอยเป็นปุ่มกลมใต้หัวห้องมุมขวาบน — ไม่ชนปุ่ม "↓ ล่าสุด" (ขวาล่าง) และการ์ดร่าง (เหนือช่องพิมพ์) */
+@media (max-width: 720px) {
+  .yolo-anchor { display: contents; }
+  .yolo-btn {
+    position: fixed; top: calc(env(safe-area-inset-top) + 70px); right: 12px; z-index: var(--z-jump);
+    width: 42px; height: 42px; min-height: 42px; padding: 0; justify-content: center;
+    box-shadow: var(--shadow-2), inset 0 0 0 1.5px color-mix(in srgb, var(--brand) 55%, transparent);
+  }
+  .yolo-btn-label { display: none; }
+  /* กล่องเปิดอยู่ = ปุ่มลอยหลบ (กล่องมี ✕ ของตัวเอง) ไม่งั้นขอบปุ่มโผล่เลยมุมกล่อง */
+  .yolo-btn.is-active { visibility: hidden; }
+}
+
+/* ------------------------------ กล่องสั่ง ------------------------------ */
+.yolo-pop {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: var(--z-sheet);
+  width: min(390px, calc(100vw - 32px)); max-height: min(78dvh, 640px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 12px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line-2); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2), 0 22px 48px -18px color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: left; white-space: normal;
+}
+.yolo-pop::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--grad-brand); pointer-events: none;
+}
+@media (max-width: 720px) {
+  .yolo-pop {
+    position: fixed; left: 16px; right: 16px; width: auto;
+    top: calc(env(safe-area-inset-top) + 64px); max-height: calc(100dvh - 150px);
+  }
+}
+/* แท็บเลือกโหมด (ทักต่อ / ส่งต่อแอดมิน — 2026-10-15) */
+.yolo-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; border-radius: 12px; background: var(--neutral-soft); }
+.yolo-tab {
+  min-height: 34px; border: none; border-radius: 9px; padding: 6px 8px; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 700; color: var(--ink-2); background: transparent;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.yolo-tab:hover { color: var(--ink); }
+.yolo-tab:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-100); }
+.yolo-tab.is-active { background: var(--surface); color: var(--brand-700); box-shadow: var(--shadow-1); }
+.yolo-choices { margin: 0; padding: 0; border: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yolo-choices > legend { padding: 0; margin-bottom: 6px; }
+.yolo-choice {
+  display: flex; gap: 8px; align-items: flex-start; padding: 9px 10px; cursor: pointer;
+  border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface);
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.yolo-choice:hover { border-color: color-mix(in srgb, var(--brand) 45%, transparent); }
+.yolo-choice:has(.yolo-radio:checked) { border-color: var(--brand); background: var(--brand-50); }
+.yolo-choice:has(.yolo-radio:focus-visible) { box-shadow: 0 0 0 3px var(--brand-100); }
+.yolo-radio { width: 16px; height: 16px; margin: 2px 0 0; flex: none; accent-color: var(--brand); }
+.yolo-choice-text { display: grid; gap: 2px; font-size: 13px; color: var(--ink); }
+.yolo-choice-sub { font-size: 11.5px; color: var(--ink-2); line-height: 1.4; }
+.yolo-suggest {
+  border: 1px dashed color-mix(in srgb, var(--brand) 55%, transparent); border-radius: 999px; padding: 4px 10px;
+  font: inherit; font-size: 12px; font-weight: 700; color: var(--brand-700); background: transparent; cursor: pointer;
+}
+.yolo-suggest:hover { background: var(--brand-50); }
+.yolo-suggest:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-100); }
+.yolo-pop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.yolo-title { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+.yolo-close { width: 32px; height: 32px; font-size: 15px; }
+.yolo-context { margin: 0; font-size: 12.5px; color: var(--ink-2); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.yolo-chip { display: inline-flex; align-items: center; min-height: 20px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.yolo-chip.is-on { background: var(--green-soft); color: var(--green); }
+.yolo-chip.is-off { background: var(--red-soft); color: var(--red); }
+
+.yolo-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.yolo-note { margin: 0; padding: 7px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.45; border: 1px solid transparent; }
+.yolo-note.is-refusal { background: var(--red-soft); color: var(--red); border-color: var(--red-line); }
+.yolo-note.is-confirm { background: var(--orange-soft); color: var(--orange); border-color: var(--orange-line); }
+.yolo-note.is-warning { background: var(--neutral-soft); color: var(--ink-2); display: flex; gap: 8px; align-items: baseline; }
+.yolo-note.is-warning::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--warm); transform: translateY(-1px); }
+
+.yolo-label { font-size: 13px; font-weight: 700; color: var(--ink); }
+.yolo-input {
+  width: 100%; min-height: 76px; resize: vertical; font: inherit; font-size: 15px; line-height: 1.5;
+  padding: 9px 12px; border: 1px solid var(--line-2); border-radius: 12px;
+  color: var(--ink); background: var(--surface);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.yolo-input::placeholder { color: var(--ink-3); opacity: 1; }
+.yolo-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100); }
+.yolo-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.yolo-check-label { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); }
+.yolo-check { width: 18px; height: 18px; margin: 0; accent-color: var(--brand); }
+.yolo-count { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.yolo-hint { margin: 0; font-size: 11.5px; color: var(--ink-2); line-height: 1.5; }
+.yolo-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.yolo-send { min-width: 132px; }
+.yolo-send.is-busy { opacity: 0.8; cursor: progress; }
+
+.yolo-result { display: grid; gap: 7px; padding: 10px 12px; border-radius: 14px; border: 1px solid transparent; }
+.yolo-result.is-sent { background: var(--green-soft); border-color: var(--green-line); }
+.yolo-result.is-partial, .yolo-result.is-confirm { background: var(--orange-soft); border-color: var(--orange-line); }
+.yolo-result.is-refused { background: var(--red-soft); border-color: var(--red-line); }
+.yolo-result-title { font-size: 13.5px; font-weight: 800; }
+.yolo-result.is-sent .yolo-result-title { color: var(--green); }
+.yolo-result.is-partial .yolo-result-title, .yolo-result.is-confirm .yolo-result-title { color: var(--orange); }
+.yolo-result.is-refused .yolo-result-title { color: var(--red); }
+.yolo-result-list { margin: 0; padding-inline-start: 18px; font-size: 12.5px; color: var(--ink); }
+.yolo-sent { display: grid; gap: 5px; }
+.yolo-sent-bubble {
+  margin: 0; padding: 8px 11px; border-radius: 14px 14px 14px 4px; white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--bubble-ai, var(--brand-50)); color: var(--ink); border: 1px solid var(--brand-100); font-size: 14px;
+}
+.yolo-meta { margin: 0; font-size: 12.5px; color: var(--ink); line-height: 1.45; }
+.yolo-meta.is-muted { color: var(--ink-2); }
+.yolo-meta.is-warning { color: var(--orange); }
+.yolo-confirm { justify-self: start; }
+
+/* ชิปใต้ฟองข้อความที่ส่งด้วย YOLO (ต่อจาก .bubble-evidence-chip ใน workspace.css) */
+.bubble-evidence-chip.evidence-yolo { color: var(--brand-700); background: var(--brand-50); border-color: color-mix(in srgb, var(--brand) 45%, transparent); }
+
+/* -------------------- บล็อกตั้งค่า "Telegram สั่งงานลูกแพร" -------------------- */
+.tg-status { display: grid; gap: 6px; }
+.tg-status-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+.tg-status-label { color: var(--ink-2); font-weight: 700; }
+.tg-pill { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; max-width: 100%; overflow-wrap: anywhere; }
+.tg-pill.is-ok { background: var(--green-soft); color: var(--green); }
+.tg-pill.is-wait { background: var(--orange-soft); color: var(--orange); }
+.tg-pill.is-off { background: var(--neutral-soft); color: var(--ink-2); }
+.tg-pill.is-bad { background: var(--red-soft); color: var(--red); }
+.tg-steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+.tg-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tg-input {
+  flex: 1 1 240px; min-width: 0; min-height: 40px; padding: 8px 12px; font: inherit; font-size: 14px;
+  border: 1px solid var(--line-2); border-radius: 10px; color: var(--ink); background: var(--surface);
+}
+.tg-input::placeholder { color: var(--ink-3); opacity: 1; }
+.tg-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100); }
+.tg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.tg-code {
+  display: grid; gap: 4px; justify-items: start; padding: 12px 14px; border-radius: 14px;
+  background: var(--brand-50); border: 1px dashed color-mix(in srgb, var(--brand) 55%, transparent);
+}
+.tg-code-label { font-size: 12px; font-weight: 700; color: var(--brand-700); }
+.tg-code-value {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 24px; font-weight: 800; letter-spacing: 0.14em;
+  color: var(--ink); user-select: all;
+}
+.tg-code-help { font-size: 12.5px; color: var(--ink-2); }
+.tg-link { font-size: 13px; font-weight: 700; color: var(--brand-700); }

@@ -1,0 +1,59 @@
+/* soul.css — หน้า "ตัวตนของ AI" (#/soul) อ่านอย่างเดียว · ใช้ token เดียวกับหน้าอื่นของคอนโซล */
+.soul-page { padding-bottom: 28px; }
+.soul-intro { display: grid; gap: 6px; }
+
+.soul-version { display: grid; gap: 14px; border-left: 4px solid var(--green); }
+.soul-version.is-missing { border-left-color: var(--orange); background: var(--orange-soft); }
+.soul-version-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.soul-version-head h2 { margin: 2px 0 4px; font-size: 20px; color: var(--ink); overflow-wrap: anywhere; }
+.soul-eyebrow { color: var(--ink-3); font-size: 12px; letter-spacing: .02em; }
+.soul-contract { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.soul-contract.is-ok { background: var(--green-soft); color: var(--green); box-shadow: inset 0 0 0 1px var(--green-line); }
+.soul-contract.is-bad { background: var(--red-soft); color: var(--red); box-shadow: inset 0 0 0 1px var(--red-line); }
+
+.soul-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.soul-fact { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.soul-fact dt { color: var(--ink-3); font-size: 12px; }
+.soul-fact dd { margin: 3px 0 0; color: var(--ink); font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
+.soul-fact small { display: block; margin-top: 3px; color: var(--ink-3); font-size: 12px; }
+
+.soul-layer-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: soul-layer; }
+.soul-layer-list li {
+  counter-increment: soul-layer; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+}
+.soul-layer-list li::before { content: counter(soul-layer); color: var(--ink-3); font-weight: 800; min-width: 1.2em; }
+.soul-layer-list li > span:first-child { flex: 1; min-width: 0; }
+.soul-layer-list li.is-soul { border-color: var(--green-line); background: var(--green-soft); font-weight: 800; }
+.soul-lock { padding: 2px 8px; border-radius: 999px; font-size: 12px; background: var(--neutral-soft); color: var(--ink-2); white-space: nowrap; }
+.soul-lock.is-open { background: var(--purple-soft); color: var(--purple); }
+
+.soul-path > summary { gap: 8px; }
+.soul-path-key { font-size: 12px; padding: 1px 6px; border-radius: 6px; background: var(--neutral-soft); color: var(--ink-2); }
+.soul-src { padding: 2px 8px; border-radius: 999px; font-size: 12px; white-space: nowrap; }
+.soul-src.is-soul { background: var(--green-soft); color: var(--green); }
+.soul-src.is-file { background: var(--orange-soft); color: var(--orange); }
+.soul-src.is-default { background: var(--neutral-soft); color: var(--ink-2); }
+.soul-path-hash { margin: 0 14px 8px; }
+.soul-pre { max-height: 420px; }
+
+.soul-b-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.soul-b-list li { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+
+@media (max-width: 720px) { .soul-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 400px) {
+  .soul-facts { grid-template-columns: 1fr; }
+  .soul-layer-list li { flex-wrap: wrap; }
+}
+
+/* ลิงก์จากหน้าความรู้ (แทนกล่อง Persona เดิม) — หน้าตาเดียวกับหัวข้อพับได้ของหน้านั้น */
+.kb-soul-anchor {
+  display: flex; align-items: center; gap: 8px; padding: 13px 14px; min-height: var(--tap);
+  font-weight: 700; font-size: 14px; color: var(--ink); text-decoration: none;
+  transition: background-color 0.12s var(--ease);
+}
+/* ลูกศรแทนเครื่องหมายพับ ให้ชื่อหัวข้อตรงแนวเดียวกับหัวข้ออื่นในกล่อง */
+.kb-soul-anchor::before { content: "↗"; color: var(--ink-3); font-size: 14px; font-weight: 700; width: 14px; }
+.kb-soul-anchor:hover { background: var(--surface-2); }
+.kb-soul-anchor:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.kb-soul-anchor .kb-ro { background: var(--green-soft); color: var(--green); }

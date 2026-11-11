@@ -1,0 +1,355 @@
+/* overview.css — หน้าภาพรวมแบบ "วันนี้เป็นยังไง" (overviewCeo.mjs) — 28 ก.ย. 2026
+   ใช้ token ของธีมเท่านั้น (ไม่มีรหัสสีตายตัว) จึงทำงานได้ทุก instance ทั้งสว่างและมืด
+   ธีมลูกแพรได้ภาพหน้าตัวละครเพิ่ม ส่วน instance อื่นเห็นโครงเดียวกันพร้อมตรายี่ห้อของตัวเอง
+   ลำดับสายตา: ลูกแพรเล่า (ประโยคเดียว) → ไม่กี่บรรทัดของวันนี้ → ใครรอทีม → เส้นทางลูกค้า → รายละเอียดทีม */
+
+.page-inner.ov { display: grid; gap: 16px; padding: 16px 14px 32px; }
+.ov > * { min-width: 0; }
+.ov .overview-branches { padding: 0; }
+
+/* ------------------------------ ส่วนหัว: ลูกแพรเล่า ------------------------------ */
+
+.ov-top { display: grid; gap: 16px; }
+.ov-col { display: grid; gap: 16px; align-content: start; min-width: 0; }
+.ov-dialog {
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px;
+  align-items: start; padding: 26px 20px 20px; border-radius: 18px;
+  background:
+    radial-gradient(340px 200px at 0% 0%, color-mix(in srgb, var(--brand) 9%, transparent), transparent 72%),
+    radial-gradient(320px 220px at 100% 100%, color-mix(in srgb, var(--purple) 8%, transparent), transparent 70%),
+    var(--surface);
+  border: 1px solid var(--line); box-shadow: var(--shadow-1);
+}
+.ov-dialog.is-alert { border-color: var(--danger-line); }
+.ov-dialog.is-warn { border-color: color-mix(in srgb, var(--warm) 38%, var(--line)); }
+.ov-dialog.is-good { border-color: var(--green-line); }
+.ov-muse-wrap { display: grid; justify-items: center; gap: 10px; padding-top: 2px; }
+.ov-mark {
+  width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center;
+  background: var(--grad-brand); color: var(--on-brand); font-weight: 800; font-size: 20px;
+}
+.ov-status {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px 2px 7px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
+  background: var(--green-soft); color: var(--green);
+}
+.ov-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.ov-status.is-paused { background: var(--orange-soft); color: var(--orange); }
+.ov-dialog-body { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+/* ป้ายชื่อแบบกล่องบทพูดในการ์ตูน — ทับขอบบนของกล่อง บอกว่าใครกำลังพูด */
+.ov-nametag {
+  position: absolute; top: 0; left: 20px; transform: translateY(-50%); margin: 0;
+  display: inline-flex; align-items: center; gap: 8px; max-width: calc(100% - 40px);
+}
+.ov-nametag-name {
+  padding: 3px 12px; border-radius: 999px; background: var(--brand); color: var(--on-brand);
+  font-size: 13px; font-weight: 600; letter-spacing: 0.01em; white-space: nowrap;
+}
+.ov-nametag-role {
+  padding: 2px 10px; border-radius: 999px; background: var(--surface); color: var(--ink-2);
+  border: 1px solid var(--line); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ov-hello { margin: 0; color: var(--ink-2); font-size: 14px; }
+.ov-headline {
+  margin: 0; font-size: 20px; line-height: 1.5; font-weight: 600; color: var(--ink);
+  text-wrap: balance; max-width: 40ch;
+}
+.ov-pulse { margin: 6px 0 0; display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 12.5px; }
+.ov-pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); flex-shrink: 0; }
+.ov-pulse.is-quiet .ov-pulse-dot { background: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+.ov-notes { display: grid; gap: 8px; margin-top: 8px; }
+.ov-note { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+.ov-note.is-warn { background: var(--warm-soft); border-color: color-mix(in srgb, var(--warm) 34%, var(--line)); }
+.ov-note-title { margin: 0; font-weight: 600; font-size: 13.5px; color: var(--warm-ink); }
+.ov-note-text { margin: 2px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.ov-note .stat-links { margin-top: 8px; }
+
+/* ------------------------------ วันนี้ในไม่กี่บรรทัด ------------------------------ */
+
+.ov-today {
+  border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.ov-lines { list-style: none; margin: 0; padding: 4px 0; }
+.ov-line + .ov-line { border-top: 1px solid var(--line); }
+.ov-line-link {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto auto; align-items: center; gap: 14px;
+  min-height: 62px; padding: 9px 16px; color: inherit; text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+button.ov-line-link {
+  width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+:is(a, button).ov-line-link:hover { background: var(--surface-2); }
+:is(a, button).ov-line-link:focus-visible { outline-offset: -3px; }
+.ov-line-icon {
+  width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--brand-50); color: var(--brand-ink);
+}
+.ov-line.is-wait .ov-line-icon { background: var(--warm-soft); color: var(--warm-ink); }
+.ov-line.is-hot .ov-line-icon { background: var(--hot-soft); color: var(--hot-ink); }
+.ov-line.is-sold .ov-line-icon { background: var(--green-soft); color: var(--green); }
+.ov-line.is-speed .ov-line-icon { background: var(--purple-soft); color: var(--purple); }
+.ov-line-text { min-width: 0; display: grid; gap: 1px; }
+.ov-line-lead { font-size: 13.5px; color: var(--ink-2); }
+.ov-line-figure { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.ov-line-value { font-size: 28px; line-height: 1.15; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.ov-line-unit { font-size: 14px; color: var(--ink-2); }
+.ov-line-sub { font-size: 12.5px; color: var(--ink-3); overflow-wrap: anywhere; }
+.ov-line.tone-attention .ov-line-value { color: var(--hot-ink); }
+.ov-line.tone-good .ov-line-value { color: var(--green); }
+.ov-line-go { color: var(--ink-3); display: inline-flex; transition: transform 0.15s ease, color 0.15s ease; }
+:is(a, button).ov-line-link:hover .ov-line-go { transform: translateX(3px); color: var(--brand-ink); }
+.spark { width: 96px; height: 30px; display: block; overflow: visible; }
+
+
+/* ------------------------------ ใครรอทีม + เส้นทางลูกค้า ------------------------------ */
+
+.ov-panel {
+  border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+  padding: 16px 16px 12px; min-width: 0;
+}
+.ov-sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.ov-sec-title { margin: 0; font-size: 16px; font-weight: 700; }
+.ov-sec-link { font-size: 13px; font-weight: 600; color: var(--brand-ink); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.ov-sec-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ov-sec-note { font-size: 12px; color: var(--ink-3); }
+
+.ov-sec-count {
+  font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: var(--green-soft); color: var(--green);
+}
+.ov-sec-count.is-alert { background: var(--hot-soft); color: var(--hot-ink); }
+.ov-attention.has-items.is-waiting { border-color: color-mix(in srgb, var(--hot) 32%, var(--line)); }
+.ov-sec-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.ov-sec-foot .ov-sec-link { margin-left: auto; }
+.ov-more {
+  min-height: 36px; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.ov-more:hover { border-color: var(--ink-3); background: var(--surface-2); }
+.ov-q-list { list-style: none; margin: 0; padding: 0; }
+.ov-q-list li + li { border-top: 1px solid var(--line); }
+.ov-q-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  min-height: 60px; padding: 8px 6px; border-radius: 12px; color: inherit; text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+.ov-q-row:hover { background: var(--surface-2); }
+.ov-q-row:focus-visible { outline-offset: -2px; }
+.ov-q-main { min-width: 0; display: grid; gap: 1px; }
+.ov-q-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ov-q-name { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ov-q-value { flex-shrink: 0; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.ov-q-value.is-money { background: var(--green-soft); color: var(--green); }
+.ov-q-value.is-hot { background: var(--hot-soft); color: var(--hot-ink); }
+.ov-q-value.is-warm { background: var(--warm-soft); color: var(--warm-ink); }
+.ov-q-channel { font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
+.ov-q-preview { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-q-side { display: grid; justify-items: end; gap: 4px; }
+.ov-q-wait { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
+.ov-q-wait.tone-warn { color: var(--warm-ink); }
+.ov-q-wait.tone-urgent { color: var(--danger); }
+.ov-empty { display: grid; justify-items: center; gap: 10px; padding: 18px 8px 14px; text-align: center; }
+.ov-empty-text { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+/* เส้นทางลูกค้า — กรวยแบบขั้นบันได: ความกว้าง/ความสูงบอก "ลำดับขั้น" ตัวเลขจริงอยู่ในแท่งเสมอ
+   มือถือเรียงบนลงล่าง (แท่งแคบลงทีละขั้น) · เดสก์ท็อปเรียงซ้ายไปขวา (แท่งเตี้ยลงทีละขั้น) */
+.ov-stages { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+.ov-stage-link {
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: 12px;
+  color: inherit; text-decoration: none; border-radius: 12px; padding: 2px;
+}
+.ov-stage-link:focus-visible { outline-offset: 0; }
+.ov-stage-bar {
+  --w: 100%;
+  justify-self: center; width: var(--w); min-height: 46px; padding: 0 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 10px 100%);
+  background: var(--cold-soft); color: var(--cold-ink);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.ov-stage.is-warm .ov-stage-bar { --w: 84%; background: var(--warm-soft); color: var(--warm-ink); }
+.ov-stage.is-hot .ov-stage-bar { --w: 68%; background: var(--hot-soft); color: var(--hot-ink); }
+.ov-stage.is-won .ov-stage-bar { --w: 52%; background: var(--green-soft); color: var(--green); }
+.ov-stage-link:hover .ov-stage-bar { filter: saturate(1.3) brightness(0.97); }
+/* 30 ก.ย. 2026: ไอคอนแทนคำ เย็น/อุ่น/ร้อน — ขนาดพอเห็นชัดบนแท่ง */
+.ov-stage-temp { font-size: 17px; line-height: 1; }
+.ov-stage-value { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ov-stage-copy { display: grid; gap: 1px; min-width: 0; }
+.ov-stage-label { font-size: 14px; font-weight: 600; }
+.ov-stage-hint { font-size: 12px; color: var(--ink-3); }
+
+/* ------------------------------ จักรวาลลูกแพร + รายละเอียดทีม ------------------------------ */
+
+.ov-universe {
+  display: flex; align-items: center; gap: 14px; min-height: 64px;
+  padding: 12px 18px; border-radius: 16px; text-decoration: none; color: var(--ink);
+  background: linear-gradient(115deg, var(--brand-50), color-mix(in srgb, var(--purple-soft) 85%, var(--surface)));
+  border: 1px solid var(--line); transition: border-color 0.15s ease;
+}
+.ov-universe:hover { border-color: var(--line-2); }
+.ov-universe::after { content: "›"; margin-left: auto; font-size: 22px; line-height: 1; color: var(--brand-ink); }
+.ov-universe-faces { display: flex; flex-shrink: 0; }
+.ov-face {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover; display: grid; place-items: center;
+  box-shadow: 0 0 0 2px var(--surface); background: var(--surface);
+}
+.ov-face + .ov-face { margin-left: -8px; }
+.ov-face.is-rain { background: var(--cold-soft); color: var(--cold-ink); }
+.ov-universe-copy { display: grid; gap: 1px; min-width: 0; }
+.ov-universe-title { font-weight: 700; font-size: 15px; }
+.ov-universe-sub { font-size: 12.5px; color: var(--ink-2); }
+
+.ov-team { border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1); }
+.ov-team-summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px;
+  align-items: center; padding: 16px 18px; min-height: 64px; border-radius: 18px;
+}
+.ov-team-summary::-webkit-details-marker { display: none; }
+.ov-team-summary::after {
+  content: ""; grid-column: 2; grid-row: 1 / span 2; width: 10px; height: 10px;
+  border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3);
+  transform: rotate(45deg); transition: transform 0.2s ease; margin-top: -4px;
+}
+.ov-team[open] > .ov-team-summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.ov-team-summary:hover { background: var(--surface-2); }
+.ov-team-summary:focus-visible { outline-offset: -3px; }
+.ov-team-title { font-weight: 700; font-size: 16px; }
+.ov-team-hint { grid-column: 1; font-size: 12.5px; color: var(--ink-3); }
+.ov-team-body { display: grid; gap: 14px; padding: 4px 14px 16px; }
+.ov-team-body > * { margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; }
+.ov-team-body .stat-grid { padding: 0; }
+.ov-team-body .trend-grid { margin: 0; }
+
+@media (min-width: 720px) {
+  .page-inner.ov { padding: 20px 18px 36px; gap: 18px; }
+  .ov-headline { font-size: 22px; }
+}
+@media (min-width: 1024px) {
+  .page-inner.ov { padding: 24px 10px 40px; gap: 20px; }
+  .ov-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 20px; }
+  .ov-col { gap: 20px; }
+  .ov-dialog { padding: 32px 26px 24px; gap: 22px; }
+  .ov-nametag { left: 26px; }
+  .ov-funnel { padding: 18px 22px 20px; }
+  .ov-stages { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: start; }
+  .ov-stage-link { grid-template-columns: minmax(0, 1fr); grid-template-rows: 104px auto; gap: 10px; padding: 0; }
+  .ov-stage-bar {
+    align-self: center; width: 100%; justify-self: stretch; min-height: 0; height: 104px; padding: 0 22px 0 18px;
+    clip-path: polygon(0 0, 100% 9%, 100% 91%, 0 100%);
+  }
+  .ov-stage.is-warm .ov-stage-bar { height: 86px; }
+  .ov-stage.is-hot .ov-stage-bar { height: 70px; }
+  .ov-stage.is-won .ov-stage-bar { height: 56px; }
+  .ov-stage-value { font-size: 24px; line-height: 1; }
+  .ov-stage-copy { padding: 0 18px 2px 4px; }
+  .ov-team-body { padding: 4px 18px 18px; }
+}
+@media (max-width: 420px) {
+  .ov-dialog { grid-template-columns: minmax(0, 1fr); padding-top: 30px; }
+  .ov-muse-wrap { grid-template-columns: auto auto; justify-content: start; align-items: center; gap: 12px; }
+  .ov-muse-wrap .lk-muse-xl { --muse: 76px; }
+  .ov-headline { font-size: 18.5px; }
+  .ov-line-link { grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; padding: 10px 14px; }
+  .ov-line-link .spark { display: none; }
+  .ov-line-value { font-size: 26px; }
+  .ov-stage-link { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 10px; }
+}
+
+/* ------------------------------ การ์ดค่าแอดใบใหญ่ (overviewAdSpend.mjs · 7 ต.ค. 2026) ------------------------------
+   เจ้าของเปิดหน้าแรกแล้วเห็นค่าแอดก่อนอย่างอื่น · น้ำเงิน Meta = เรื่องแอด (ชุดเดียวกับ ad-referral.css) */
+.adsp {
+  position: relative; overflow: hidden;
+  margin: 0 0 16px; padding: 18px 20px 16px; border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--adref-meta) 26%, var(--line));
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--adref-meta) 13%, transparent), transparent 55%),
+    linear-gradient(135deg, color-mix(in srgb, var(--brand) 6%, var(--surface)), var(--surface) 65%);
+  box-shadow: var(--shadow-2);
+}
+.adsp::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+  background: linear-gradient(90deg, var(--adref-meta), var(--brand));
+}
+.adsp-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.adsp-icon {
+  flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; color: var(--on-brand);
+  background: linear-gradient(135deg, var(--adref-meta), var(--brand));
+  box-shadow: 0 4px 12px rgba(8, 102, 255, 0.28);
+}
+.adsp-head-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.adsp-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--ink); }
+.adsp-sub { font-size: 12.5px; color: var(--ink-3); }
+.adsp-more {
+  flex: none; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: border-color 150ms var(--ease), color 150ms var(--ease);
+}
+.adsp-more:hover { border-color: var(--adref-meta); color: var(--adref-meta-ink); }
+
+.adsp-body { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: end; }
+.adsp-tiles { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; }
+.adsp-tile {
+  display: grid; gap: 2px; align-content: end; padding: 12px 14px; border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent); border: 1px solid var(--line);
+}
+.adsp-tile.is-big {
+  background: linear-gradient(135deg, var(--adref-meta), color-mix(in srgb, var(--adref-meta) 55%, var(--brand)));
+  border-color: transparent; color: var(--on-brand); box-shadow: 0 6px 18px rgba(8, 102, 255, 0.3);
+}
+.adsp-tile-label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.adsp-tile.is-big .adsp-tile-label { color: rgba(255, 255, 255, 0.86); }
+.adsp-tile-value {
+  font-size: 26px; line-height: 1.15; font-weight: 800; color: var(--ink);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em; white-space: nowrap;
+}
+.adsp-tile.is-big .adsp-tile-value { font-size: 40px; color: var(--on-brand); }
+.adsp-tile-note { font-size: 11.5px; color: var(--ink-3); }
+.adsp-tile-note.is-warn { color: var(--orange); font-weight: 700; }
+.adsp-tile.is-big .adsp-tile-note.is-warn { color: var(--warm-soft); }
+
+.adsp-chart { display: grid; gap: 4px; }
+.adsp-bars { width: 100%; height: 86px; display: block; }
+.adsp-bar { fill: color-mix(in srgb, var(--adref-meta) 34%, transparent); }
+.adsp-bar.is-last { fill: var(--adref-meta); }
+.adsp-bar.is-empty { fill: var(--line-2); }
+.adsp-chart-axis { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); }
+
+.adsp-foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px;
+  margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-2);
+}
+.adsp-funnel { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.adsp-foot-label {
+  font-size: 11.5px; font-weight: 800; color: var(--adref-meta-ink); letter-spacing: 0.02em;
+  padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--adref-meta) 12%, transparent);
+}
+.adsp-step { display: grid; justify-items: center; line-height: 1.1; }
+.adsp-step-value { font-size: 22px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+.adsp-step.is-paid .adsp-step-value { color: var(--green); }
+.adsp-step-label { font-size: 11.5px; color: var(--ink-3); }
+.adsp-arrow { color: var(--ink-3); font-size: 16px; }
+.adsp-costs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+.adsp-cost, .adsp-roas { padding: 6px 11px; border-radius: 999px; background: var(--surface-2); white-space: nowrap; }
+.adsp-cost strong, .adsp-roas strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.adsp-roas.is-good { background: var(--green-soft); }
+.adsp-roas.is-good .adsp-roas-x { color: var(--green); font-weight: 800; }
+.adsp-roas.is-mid .adsp-roas-x { color: var(--orange); font-weight: 800; }
+.adsp-roas.is-bad { background: var(--red-soft); }
+.adsp-roas.is-bad .adsp-roas-x { color: var(--red); font-weight: 800; }
+
+.adsp-empty { display: flex; align-items: center; gap: 14px; }
+.adsp-empty p { margin: 2px 0 0; color: var(--ink-3); font-size: 13px; }
+
+@media (max-width: 900px) {
+  .adsp-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .adsp { padding: 16px 14px 14px; }
+  .adsp-tiles { grid-template-columns: 1fr 1fr; }
+  .adsp-tile.is-big { grid-column: 1 / -1; }
+  .adsp-tile.is-big .adsp-tile-value { font-size: 36px; }
+  .adsp-more { padding: 7px 11px; font-size: 12px; }
+  .adsp-foot { flex-direction: column; align-items: flex-start; }
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<!-- iPhone เปิด Web Push ให้เฉพาะเว็บที่ถูกเพิ่มไว้ที่หน้าจอโฮมเท่านั้น และคนที่ยังไม่ล็อกอิน
+     จะถูกส่งมาหน้านี้เสมอ ถ้าหน้านี้ไม่มี manifest/apple tag การ "เพิ่มไปหน้าจอโฮม"
+     จะได้แค่บุ๊กมาร์ก ไม่ใช่แอป → เปิดแจ้งเตือนไม่ได้เลยตลอดไป -->
+<!-- CONSOLE_BRAND_HEAD_START -->
+<meta name="theme-color" content="#f4f7fc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/console/static/manifest.webmanifest">
+<link rel="icon" href="/console/static/company-logo-2026.png" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/console/static/app-icon-180.png">
+<!-- CONSOLE_BRAND_HEAD_END -->
+<title>เข้าสู่ระบบ · Front Desk Console</title>
+<link rel="stylesheet" href="/console/static/console.css">
+<link rel="stylesheet" href="/console/static/instance-scope.css">
+<!-- CONSOLE_THEME_CSS -->
+</head>
+<body class="login-body">
+<main class="login-wrap">
+  <div class="login-hero">
+    <div class="login-mark" id="brand-mark" aria-hidden="true">FD</div>
+    <h1 id="brand-name">Front Desk Console</h1>
+    <p class="sub" id="brand-agent">สำหรับทีมแอดมินเท่านั้น</p>
+  </div>
+
+  <form class="card login-card" id="form">
+    <label for="username">ชื่อผู้ใช้</label>
+    <input type="text" id="username" name="username" autocomplete="username"
+           autocapitalize="none" spellcheck="false" required autofocus>
+    <label for="password">รหัสผ่าน</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+    <button class="btn btn-primary btn-block" type="submit">เข้าสู่ระบบ</button>
+    <p id="error" class="banner-error" hidden></p>
+  </form>
+</main>
+<!-- 28 ก.ย. 2026: หน้าต่างโค้งของลูกแพร — ซ่อนในธีมอื่น (display:none) และรูปมาจาก CSS
+     background ของธีม lukprae เท่านั้น instance อื่นจึงไม่โหลดรูปนี้เลย -->
+<div class="login-stage" aria-hidden="true"><span class="login-bubble">ยินดีต้อนรับกลับค่ะ <span class="nb">ลูกแพร</span>ดูแลแชทให้อยู่นะคะ</span></div>
+<script type="module" src="/console/static/login.js"></script>
+</body>
+</html>
